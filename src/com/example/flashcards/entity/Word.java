@@ -1,8 +1,9 @@
 package com.example.flashcards.entity;
 
+import java.io.Serializable;
 import java.util.List;
 
-public class Word {
+public class Word  implements Serializable{
 	//translations in first and second language where the second is the one to be learned
 	private String first;
 	private String second;
@@ -10,6 +11,25 @@ public class Word {
 	private double rating;
 	
 	
+	
+	
+	public Word(String first, String second, List<String> wordUsage) {
+		super();
+		this.first = first;
+		this.second = second;
+		this.wordUsage = wordUsage;
+		this.rating = 0;
+	}
+	
+	
+	
+	public Word() {
+		super();
+		this.rating = 0;
+	}
+
+
+
 	public String getFirst() {
 		return first;
 	}
@@ -34,6 +54,14 @@ public class Word {
 	public void setRating(double rating) {
 		this.rating = rating;
 	}
+
+
+
+	@Override
+	public String toString() {
+		return first + " | " + second;
+	}
+	
 	
 	
 	

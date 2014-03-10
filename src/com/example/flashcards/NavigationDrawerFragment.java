@@ -4,6 +4,7 @@ import java.util.List;
 
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.mvc.Controller;
+import com.example.flashcards.mvc.Model;
 
 import android.support.v7.app.ActionBarActivity;
 import android.app.Activity;
@@ -16,6 +17,7 @@ import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
 import android.preference.PreferenceManager;
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.Menu;
 import android.view.MenuInflater;
@@ -34,6 +36,8 @@ import android.widget.Toast;
  */
 public class NavigationDrawerFragment extends Fragment {
 
+	Model model = Controller.getInstanceOf().getModel();
+
     /**
      * Remember the position of the selected item.
      */
@@ -44,6 +48,8 @@ public class NavigationDrawerFragment extends Fragment {
      * expands it. This shared preference tracks this.
      */
     private static final String PREF_USER_LEARNED_DRAWER = "navigation_drawer_learned";
+
+	private static final String NAVIGATION_DRAWER = "NAVIGATION_DRAWER";
 
     /**
      * A pointer to the current callbacks instance (the Activity).
@@ -59,7 +65,7 @@ public class NavigationDrawerFragment extends Fragment {
     private ListView mDrawerListView;
     private View mFragmentContainerView;
 
-    private int mCurrentSelectedPosition = 0;
+    private Dictionary selectedDictionary = null;
     private boolean mFromSavedInstanceState;
     private boolean mUserLearnedDrawer;
 
@@ -76,12 +82,15 @@ public class NavigationDrawerFragment extends Fragment {
         mUserLearnedDrawer = sp.getBoolean(PREF_USER_LEARNED_DRAWER, false);
 
         if (savedInstanceState != null) {
-            mCurrentSelectedPosition = savedInstanceState.getInt(STATE_SELECTED_POSITION);
+        	//reads selected dictionary from persistent memory
+            selectedDictionary = 
+                	model.getDictionaries().get(savedInstanceState.getInt(STATE_SELECTED_POSITION));
             mFromSavedInstanceState = true;
         }
 
         // Select either the default item (0) or the last selected item.
-        selectItem(mCurrentSelectedPosition);
+        
+        dictionarySelected(selectedDictionary);
     }
 
     @Override
@@ -99,7 +108,8 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerListView.setOnItemClickListener(new AdapterView.OnItemClickListener() {
             @Override
             public void onItemClick(AdapterView<?> parent, View view, int position, long id) {
-                selectItem(position);
+                dictionarySelected((Dictionary)mDrawerListView.getAdapter().getItem(position));
+                
             }
         });
         //dictionary selection
@@ -109,7 +119,8 @@ public class NavigationDrawerFragment extends Fragment {
                 android.R.layout.simple_list_item_1,
                 android.R.id.text1,
                 list.toArray(new Dictionary[list.size()])));
-        mDrawerListView.setItemChecked(mCurrentSelectedPosition, true);
+
+        mDrawerListView.setItemChecked(model.getDictionaries().indexOf(selectedDictionary), true);
         return mDrawerListView;
     }
 
@@ -191,16 +202,18 @@ public class NavigationDrawerFragment extends Fragment {
         mDrawerLayout.setDrawerListener(mDrawerToggle);
     }
 
-    private void selectItem(int position) {
-        mCurrentSelectedPosition = position;
+    private void dictionarySelected(Dictionary dictionary) {
+    	if(dictionary==null) dictionary = model.getDictionaries().get(0);
+    	Log.d(NAVIGATION_DRAWER, "dictionarySelected dictionary: "+dictionary);
+        selectedDictionary = dictionary;
         if (mDrawerListView != null) {
-            mDrawerListView.setItemChecked(position, true);
+            mDrawerListView.setItemChecked(model.getDictionaries().indexOf(dictionary), true);
         }
         if (mDrawerLayout != null) {
             mDrawerLayout.closeDrawer(mFragmentContainerView);
         }
         if (mCallbacks != null) {
-            mCallbacks.onNavigationDrawerItemSelected(position);
+            mCallbacks.onNavigationDrawerItemSelected(dictionary);
         }
     }
 
@@ -223,7 +236,7 @@ public class NavigationDrawerFragment extends Fragment {
     @Override
     public void onSaveInstanceState(Bundle outState) {
         super.onSaveInstanceState(outState);
-        outState.putInt(STATE_SELECTED_POSITION, mCurrentSelectedPosition);
+        outState.putInt(STATE_SELECTED_POSITION, model.getDictionaries().indexOf(selectedDictionary));
     }
 
     @Override
@@ -280,6 +293,7 @@ public class NavigationDrawerFragment extends Fragment {
         /**
          * Called when an item in the navigation drawer is selected.
          */
-        void onNavigationDrawerItemSelected(int position);
+        void onNavigationDrawerItemSelected(Dictionary dictionary);
+
     }
 }
