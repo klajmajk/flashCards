@@ -14,8 +14,9 @@ import android.widget.ListView;
 
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.entity.Word;
+import com.example.flashcards.mvc.Controller;
 
-public class MainFrangment extends Fragment {
+public class MainFragment extends Fragment {
 	/**
 	 * The fragment argument representing the section number for this fragment.
 	 */
@@ -26,16 +27,17 @@ public class MainFrangment extends Fragment {
 	/**
 	 * Returns a new instance of this fragment for the given section number.
 	 */
-	public static MainFrangment newInstance(Dictionary dictionary) {
+	public static MainFragment newInstance(Dictionary dictionary) {
 
-		MainFrangment fragment = new MainFrangment();
+		MainFragment fragment = new MainFragment();
 		Bundle args = new Bundle();
+		Controller.getInstanceOf().setActiveDictionary(dictionary);
 		args.putSerializable(ARG_DICTIONARY, dictionary);
 		fragment.setArguments(args);
 		return fragment;
 	}
 
-	public MainFrangment() {
+	public MainFragment() {
 		super();
 	}
 
@@ -43,7 +45,9 @@ public class MainFrangment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+		
 		activeDictionary = (Dictionary) getArguments().getSerializable(ARG_DICTIONARY);
+		
 		View rootView = inflater.inflate(R.layout.fragment_main, container,
 				false);
 		ListView listView = (ListView) rootView.findViewById(R.id.words_listView);

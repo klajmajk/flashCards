@@ -29,5 +29,12 @@ public class Topic  implements Serializable{
 	public void addWord(Word word){
 		words.add(word);
 	}
+	@Override
+	public String toString() {
+		return getName();
+	}	
+	
+	
+	
 	
 }
