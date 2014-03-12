@@ -8,17 +8,19 @@ public class Word  implements Serializable{
 	private String first;
 	private String second;
 	private List<String> wordUsage;
+	private Topic topic;
 	private double rating;
 	
 	
 	
 	
-	public Word(String first, String second, List<String> wordUsage) {
+	public Word(String first, String second, List<String> wordUsage, Topic topic) {
 		super();
 		this.first = first;
 		this.second = second;
 		this.wordUsage = wordUsage;
 		this.rating = 0;
+		this.topic = topic;
 	}
 	
 	
@@ -53,6 +55,20 @@ public class Word  implements Serializable{
 	}
 	public void setRating(double rating) {
 		this.rating = rating;
+	}
+	
+	
+
+
+
+	public Topic getTopic() {
+		return topic;
+	}
+
+
+
+	public void setTopic(Topic topic) {
+		this.topic = topic;
 	}
 
 

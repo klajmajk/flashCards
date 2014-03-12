@@ -16,10 +16,9 @@ public class Model {
 		super();
 		this.dictionaries = new ArrayList<Dictionary> ();
 		dictionaries.add(new Dictionary(new Locale("cs", "CZ"), Locale.GERMAN)); 
-		dictionaries.add(new Dictionary(new Locale("cs", "CZ"), Locale.ENGLISH)); 		
-		dictionaries.get(0).addTopic(new Topic("misc"));
+		dictionaries.add(new Dictionary(new Locale("cs", "CZ"), Locale.ENGLISH)); 	
 		String [] array = {"one","two"};
-		dictionaries.get(0).getTopics().get(0).getWords().add(new Word("pes", "der Hund", new ArrayList<String>(Arrays.asList(array))));
+		dictionaries.get(0).addWord(new Word("pes", "der Hund", new ArrayList<String>(Arrays.asList(array)),new Topic("misc")));
 		}
 
 	public List<Dictionary> getDictionaries() {

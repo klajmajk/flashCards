@@ -23,6 +23,7 @@ import android.app.AlertDialog;
 import android.content.DialogInterface;
 import android.support.v4.app.Fragment;
 import android.text.TextUtils;
+import android.util.Log;
 import android.widget.EditText;
 
 import java.util.ArrayList;
@@ -34,6 +35,7 @@ import java.util.List;
  */
 public class SingleTopicChoicePage extends SingleFixedChoicePage {
 	public static final String TOPIC = "topic";
+	private static final String LOG_TAG = "SingleTopicChoicePage";
     protected ArrayList<Object> mChoices = new ArrayList<>();
 
     public SingleTopicChoicePage(ModelCallbacks callbacks, String title) {
@@ -46,7 +48,11 @@ public class SingleTopicChoicePage extends SingleFixedChoicePage {
     }
 
     public String getOptionAt(int position) {
-        return mChoices.get(position).toString();
+    	Log.d(LOG_TAG, "mChoices.get(position): "+mChoices.get(position)+" instanfe of topic: "+ (mChoices.get(position) instanceof Topic));
+    	if(mChoices.get(position) instanceof Topic){
+    		return ((Topic) mChoices.get(position)).getName();
+    	}else
+    		return mChoices.get(position).toString();
     }
     
     public Object getOptionObjectAt(int position) {
@@ -59,7 +65,7 @@ public class SingleTopicChoicePage extends SingleFixedChoicePage {
 
     @Override
     public void getReviewItems(ArrayList<ReviewItem> dest) {
-        dest.add(new ReviewItem(getTitle(), mData.getSerializable(TOPIC).toString(), getKey()));
+        dest.add(new ReviewItem(getTitle(), ((Topic) mData.getSerializable(TOPIC)).getName(), getKey()));
     }
 
     @Override

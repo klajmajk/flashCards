@@ -2,6 +2,7 @@ package com.example.flashcards;
 
 import android.os.Bundle;
 import android.support.v4.app.FragmentManager;
+import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
@@ -30,9 +31,12 @@ public class MainActivity extends ActionBarActivity implements
 	 */
 	private CharSequence mTitle;
 
+	private Dictionary activeDictionary;
+
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
+
 		setContentView(R.layout.activity_main);
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
@@ -46,17 +50,23 @@ public class MainActivity extends ActionBarActivity implements
 
 	@Override
 	public void onNavigationDrawerItemSelected(Dictionary dictionary) {
-		Log.d(LOG_TAG, "onNavigationDrawerItemSelected dictionary: "+dictionary);
+		// TODO this should be edited to a nicer form
+		Log.d(LOG_TAG, "dicitionary: " + dictionary + " activeDictionary"
+				+ activeDictionary);
+		activeDictionary = dictionary;
+		Log.d(LOG_TAG, "onNavigationDrawerItemSelected dictionary: "
+				+ dictionary);
 		// update the main content by replacing fragments
 		FragmentManager fragmentManager = getSupportFragmentManager();
-		fragmentManager
-				.beginTransaction()
-				.replace(R.id.container,
-						MainFragment.newInstance(dictionary)).commit();
+		FragmentTransaction transaction = fragmentManager.beginTransaction();
+		transaction.replace(R.id.container,
+				MainFragment.newInstance(dictionary));
+
+		transaction.commit();
 	}
 
 	public void onSectionAttached(Dictionary selected) {
-			mTitle = "Sekce: "+selected.toString();
+		mTitle = "Sekce: " + selected.toString();
 	}
 
 	public void restoreActionBar() {
@@ -91,9 +101,8 @@ public class MainActivity extends ActionBarActivity implements
 		return super.onOptionsItemSelected(item);
 	}
 
-
 	/**
 	 * A placeholder fragment containing a simple view.
 	 */
-	
+
 }

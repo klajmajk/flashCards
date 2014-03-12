@@ -7,6 +7,7 @@ import com.example.flashcards.entity.Topic;
 import com.example.flashcards.entity.Word;
 import com.example.flashcards.mvc.Controller;
 import com.example.flashcards.wizard.NewWordWizardModel;
+import com.example.flashcards.wizard.SandwichWizardModel;
 import com.example.flashcards.wizardpager.wizard.model.AbstractWizardModel;
 import com.example.flashcards.wizardpager.wizard.model.HandInputWordPage;
 import com.example.flashcards.wizardpager.wizard.model.ModelCallbacks;
@@ -85,6 +86,10 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+
+		Log.d(LOG_TAG, "NewWordFragment onCreateView");
+
+		Log.d(LOG_TAG, "getActivity"+getActivity());
 		View rootView = inflater.inflate(R.layout.activity_wizard, container,
 				false);
 
@@ -101,7 +106,6 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 		mPager = (ViewPager) rootView.findViewById(R.id.pager);
 
 		mStepPagerStrip = (StepPagerStrip) rootView.findViewById(R.id.strip);
-		Log.d(LOG_TAG, "mPager: "+mPager+" mPagerAdapter: "+mPagerAdapter+" mStepPagerStrip: "+mStepPagerStrip);
 		mPager.setAdapter(mPagerAdapter);
 		
 		
@@ -156,7 +160,7 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 				String first = getJointBundle().getString(HandInputWordPage.FIRST);
 				String second = getJointBundle().getString(HandInputWordPage.SECOND);
 				Topic topic = (Topic)getJointBundle().getSerializable(SingleTopicChoicePage.TOPIC);
-				Controller.getInstanceOf().addNewWord(new Word(first, second, null), topic);				
+				Controller.getInstanceOf().addNewWord(new Word(first, second, null, topic) );				
 			}
 		});
 
@@ -177,6 +181,12 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
+		Log.d(LOG_TAG, " onAttach");
+		//TODO tady musim obnovit i ty co sou pod ni
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	}
 
 	@Override

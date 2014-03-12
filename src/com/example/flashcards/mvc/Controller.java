@@ -16,37 +16,33 @@ public class Controller {
 		super();
 		this.model = new Model();
 	}
-	
-	public static Controller getInstanceOf(){
-		if(instance == null){
-			instance = new Controller();			
+
+	public static Controller getInstanceOf() {
+		if (instance == null) {
+			instance = new Controller();
 		}
 		return instance;
-		
+
 	}
 
 	public Model getModel() {
 		return model;
 	}
 
-	
-
 	public Dictionary getActiveDictionary() {
 		return activeDictionary;
 	}
 
 	public void setActiveDictionary(Dictionary dictionary) {
-		this.activeDictionary= dictionary;
-		
+		this.activeDictionary = dictionary;
+
 	}
 
-	public void addNewWord(Word word, Topic topic) {
+	public void addNewWord(Word word) {
 
-		Log.d(LOG_TAG, "Adding new word: "+word+" topic: "+topic);
-		
+		Log.d(LOG_TAG, "Adding new word: " + word );
+		activeDictionary.addWord(word);
+		Log.d(LOG_TAG, "AddWord activeDict:" + activeDictionary.toStringFull());
 	}
-	
-	
-	
 
 }

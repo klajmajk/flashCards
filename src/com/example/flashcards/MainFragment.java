@@ -45,13 +45,14 @@ public class MainFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		
-		activeDictionary = (Dictionary) getArguments().getSerializable(ARG_DICTIONARY);
+		Log.d(LOG_TAG, "MainFragment onCreateView");
+		activeDictionary = Controller.getInstanceOf().getActiveDictionary();
 		
 		View rootView = inflater.inflate(R.layout.fragment_main, container,
 				false);
 		ListView listView = (ListView) rootView.findViewById(R.id.words_listView);
-		List<Word> list = activeDictionary.getAllWords();
+		List<Word> list = activeDictionary.getWords();
+		Log.d(LOG_TAG, "Words"+list.toString());
 		Word[] words = list.toArray(new Word[list.size()]);
 		listView.setAdapter(new ArrayAdapter<Word>(getActivity(),android.R.layout.simple_list_item_1, words));
 		/*TextView textView = (TextView) rootView

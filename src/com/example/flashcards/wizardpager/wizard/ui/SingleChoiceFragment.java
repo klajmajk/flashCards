@@ -23,8 +23,11 @@ import android.os.Handler;
 import android.support.v4.app.ListFragment;
 import android.support.v7.app.ActionBarActivity;
 
+import com.example.flashcards.MainActivity;
 import com.example.flashcards.NewWordFragment;
 import com.example.flashcards.R;
+
+import android.util.Log;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.ViewGroup;
@@ -40,6 +43,8 @@ import com.example.flashcards.wizardpager.wizard.model.SingleFixedChoicePage;
 
 public class SingleChoiceFragment extends ListFragment {
     private static final String ARG_KEY = "key";
+
+	private static final String LOG_TAG = "SINGLE_CHOICE_FRAGMENT";
 
     private PageFragmentCallbacks mCallbacks;
     private List<String> mChoices;
@@ -76,6 +81,8 @@ public class SingleChoiceFragment extends ListFragment {
     @Override
     public View onCreateView(LayoutInflater inflater, ViewGroup container,
             Bundle savedInstanceState) {
+    	
+    	Log.d(LOG_TAG, "getSctivity() "+ getActivity());
         View rootView = inflater.inflate(R.layout.fragment_page, container, false);
         ((TextView) rootView.findViewById(android.R.id.title)).setText(mPage.getTitle());
 
@@ -106,7 +113,9 @@ public class SingleChoiceFragment extends ListFragment {
     @Override
     public void onAttach(Activity activity) {
         super.onAttach(activity);
-        if (activity instanceof ActionBarActivity) {
+
+        Log.d(LOG_TAG, activity.toString());
+        if (activity instanceof MainActivity) {
 			NewWordFragment fragment = (NewWordFragment) ((ActionBarActivity) activity)
 					.getSupportFragmentManager().findFragmentById(
 							R.id.container);
@@ -117,6 +126,9 @@ public class SingleChoiceFragment extends ListFragment {
 			}
 
 			mCallbacks = (PageFragmentCallbacks) fragment;
+		}else{
+			throw new ClassCastException(
+					"Fuck Activity must implement PageFragmentCallbacks");
 		}
     }
 

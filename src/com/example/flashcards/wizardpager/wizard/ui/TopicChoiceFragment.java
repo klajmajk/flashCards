@@ -16,6 +16,7 @@
 
 package com.example.flashcards.wizardpager.wizard.ui;
 
+import com.example.flashcards.MainActivity;
 import com.example.flashcards.NewWordFragment;
 import com.example.flashcards.R;
 import com.example.flashcards.entity.Topic;
@@ -54,7 +55,7 @@ public class TopicChoiceFragment extends ListFragment {
 	private static final String LOG_TAG = null;
 
 	private PageFragmentCallbacks mCallbacks;
-	private List<Object> mChoices;
+	private List<String> mChoices;
 	private String mKey;
 	private Page mPage;
 
@@ -76,21 +77,23 @@ public class TopicChoiceFragment extends ListFragment {
 
 		Bundle args = getArguments();
 		mKey = args.getString(ARG_KEY);
-		Log.d(LOG_TAG, "key: "+mKey);
+		Log.d(LOG_TAG, "key: " + mKey);
 		mPage = mCallbacks.onGetPage(mKey);
 
-		Log.d(LOG_TAG, "page: "+mPage);
+		Log.d(LOG_TAG, "page: " + mPage);
 
 		SingleTopicChoicePage fixedChoicePage = (SingleTopicChoicePage) mPage;
-		mChoices = new ArrayList<Object>();
+		mChoices = new ArrayList<String>();
 		for (int i = 0; i < fixedChoicePage.getOptionCount(); i++) {
-			mChoices.add(fixedChoicePage.getOptionObjectAt(i));
+			mChoices.add(fixedChoicePage.getOptionAt(i));
 		}
 	}
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
+
+		Log.d(LOG_TAG, "TopicFragment onCreateView");
 		View rootView = inflater.inflate(R.layout.fragment_page, container,
 				false);
 		((TextView) rootView.findViewById(android.R.id.title)).setText(mPage
@@ -98,7 +101,7 @@ public class TopicChoiceFragment extends ListFragment {
 
 		final ListView listView = (ListView) rootView
 				.findViewById(android.R.id.list);
-		setListAdapter(new ArrayAdapter<Object>(getActivity(),
+		setListAdapter(new ArrayAdapter<String>(getActivity(),
 				android.R.layout.simple_list_item_single_choice,
 				android.R.id.text1, mChoices));
 		listView.setChoiceMode(ListView.CHOICE_MODE_SINGLE);
@@ -124,7 +127,7 @@ public class TopicChoiceFragment extends ListFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		if (activity instanceof ActionBarActivity) {
+		if (activity instanceof MainActivity) {
 			NewWordFragment fragment = (NewWordFragment) ((ActionBarActivity) activity)
 					.getSupportFragmentManager().findFragmentById(
 							R.id.container);
@@ -135,6 +138,9 @@ public class TopicChoiceFragment extends ListFragment {
 			}
 
 			mCallbacks = (PageFragmentCallbacks) fragment;
+		} else {
+			throw new ClassCastException(
+					"Fuck Activity must implement PageFragmentCallbacks");
 		}
 	}
 
@@ -146,10 +152,11 @@ public class TopicChoiceFragment extends ListFragment {
 
 	@Override
 	public void onListItemClick(ListView l, View v, int position, long id) {
-		Log.d(LOG_TAG, "Object: "+ mChoices.get(position));
-		if (mChoices.get(position) instanceof Topic) {
-			mPage.getData().putSerializable(SingleTopicChoicePage.TOPIC,(Serializable)
-					getListAdapter().getItem(position));
+		Log.d(LOG_TAG, "Object: " + mChoices.get(position));
+		if (mChoices.get(position) != "Nový") {
+			SingleTopicChoicePage fixedChoicePage = (SingleTopicChoicePage) mPage;
+			mPage.getData().putSerializable(SingleTopicChoicePage.TOPIC,
+					(Topic) fixedChoicePage.getOptionObjectAt(position));
 
 			mPage.notifyDataChanged();
 		} else {
@@ -158,18 +165,20 @@ public class TopicChoiceFragment extends ListFragment {
 	}
 
 	private void createNewTopic(String value) {
-		//make changes on page
-		Log.d(LOG_TAG, "Name: " + value);
-		SingleTopicChoicePage fixedChoicePage = (SingleTopicChoicePage) mPage;
-		Topic topic = new Topic(value);
-		Controller.getInstanceOf().getActiveDictionary().addTopic(topic);
-		fixedChoicePage.addTopic(topic);
-		ArrayAdapter<Object> adapter = (ArrayAdapter)getListAdapter();
-		adapter.insert(topic, adapter.getCount()-1);
-		//continue like normally
-		mPage.getData().putSerializable(SingleTopicChoicePage.TOPIC, topic);
-		mPage.notifyDataChanged();
-	}	
+		// make changes on page
+		if (value.trim() != "")
+		{
+			Log.d(LOG_TAG, "Name: " + value);
+			SingleTopicChoicePage fixedChoicePage = (SingleTopicChoicePage) mPage;
+			Topic topic = new Topic(value);
+			fixedChoicePage.addTopic(topic);
+			ArrayAdapter<Object> adapter = (ArrayAdapter) getListAdapter();
+			adapter.insert(topic.getName(), adapter.getCount() - 1);
+			// continue like normally
+			mPage.getData().putSerializable(SingleTopicChoicePage.TOPIC, topic);
+			mPage.notifyDataChanged();
+		}
+	}
 
 	private void getNewTopicName() {
 
@@ -199,7 +208,5 @@ public class TopicChoiceFragment extends ListFragment {
 
 		alert.show();
 	}
-
-	
 
 }

@@ -12,6 +12,7 @@ public class Dictionary implements Serializable {
 	 * 
 	 */
 	private static final long serialVersionUID = 1L;
+	private List<Word> words;
 	private List<Topic> topics;
 	private Locale first;
 	private Locale second;
@@ -20,24 +21,38 @@ public class Dictionary implements Serializable {
 		this.first = first;
 		this.second = second;
 		this.topics = new ArrayList<Topic>();
+		this.words = new ArrayList<Word>();
 	}
 	@Override
 	public String toString() {
 		return  first.getDisplayLanguage() + " - " + second.getDisplayLanguage();
 	}
-	public List<Word> getAllWords() {
-		List<Word> result = new ArrayList<>();
-		for (Topic topic : topics) {
-			result.addAll(topic.getWords());			
-		}
-		return result;
+	public List<Word> getWords() {
+		return words;
 	}
-	public void addTopic(Topic topic) {
-		topics.add(topic);
+	private Topic addTopic(Topic topic) {
+
+		if(!topics.contains(topic)){
+			topics.add(topic);
+		}else{
+			topic = topics.get(topics.indexOf(topic));
+		}
+		return topic;
 		
 	}
 	public List<Topic> getTopics() {
 		return topics;
+		
+	}
+	
+	
+	public String toStringFull() {
+		return "Dictionary [topics=" + topics + ", first=" + first
+				+ ", second=" + second + "]";
+	}
+	public void addWord(Word word) {
+		words.add(word);
+		addTopic(word.getTopic());
 		
 	}
 	
