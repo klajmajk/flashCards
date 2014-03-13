@@ -21,6 +21,7 @@ import com.example.flashcards.R;
 import com.example.flashcards.wizardpager.wizard.model.MultipleFixedChoicePage;
 import com.example.flashcards.wizardpager.wizard.model.Page;
 
+
 import android.app.Activity;
 import android.os.Bundle;
 import android.os.Handler;

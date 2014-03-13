@@ -25,6 +25,7 @@ import com.example.flashcards.wizardpager.wizard.model.Page;
 import com.example.flashcards.wizardpager.wizard.model.SingleFixedChoicePage;
 import com.example.flashcards.wizardpager.wizard.model.SingleTopicChoicePage;
 
+
 import android.support.v7.app.ActionBarActivity;
 
 import android.app.Activity;

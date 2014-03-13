@@ -41,6 +41,7 @@ import java.util.List;
 import com.example.flashcards.wizardpager.wizard.model.Page;
 import com.example.flashcards.wizardpager.wizard.model.SingleFixedChoicePage;
 
+
 public class SingleChoiceFragment extends ListFragment {
     private static final String ARG_KEY = "key";
 

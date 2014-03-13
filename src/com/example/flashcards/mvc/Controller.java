@@ -1,5 +1,7 @@
 package com.example.flashcards.mvc;
 
+import java.util.List;
+
 import android.util.Log;
 
 import com.example.flashcards.entity.Dictionary;
@@ -43,6 +45,13 @@ public class Controller {
 		Log.d(LOG_TAG, "Adding new word: " + word );
 		activeDictionary.addWord(word);
 		Log.d(LOG_TAG, "AddWord activeDict:" + activeDictionary.toStringFull());
+	}
+
+	public void addImportWords(List<Word> readImportWords) {
+		for (Word word : readImportWords) {
+			addNewWord(word);
+		}
+		
 	}
 
 }

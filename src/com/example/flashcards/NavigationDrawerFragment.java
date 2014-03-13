@@ -2,6 +2,7 @@ package com.example.flashcards;
 
 import java.util.List;
 
+import com.example.flashcards.R;
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.mvc.Controller;
 import com.example.flashcards.mvc.Model;
@@ -15,6 +16,7 @@ import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.GravityCompat;
 import android.support.v4.widget.DrawerLayout;
+import android.content.Intent;
 import android.content.SharedPreferences;
 import android.content.res.Configuration;
 import android.os.Bundle;
@@ -310,6 +312,9 @@ public class NavigationDrawerFragment extends Fragment {
 			transaction.replace(R.id.container, NewWordFragment.newInstance())
 					.commit();
 			return true;
+		}else if(item.getItemId() == R.id.action_test){
+			Intent myIntent = new Intent(getActivity(), HelloActivity.class);
+			getActivity().startActivity(myIntent);
 		}
 
 		return super.onOptionsItemSelected(item);

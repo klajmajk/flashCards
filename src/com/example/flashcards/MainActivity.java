@@ -10,6 +10,7 @@ import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
+import com.example.flashcards.R;
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.wizardpager.wizard.model.Page;
 import com.example.flashcards.wizardpager.wizard.ui.PageFragmentCallbacks;
@@ -46,6 +47,7 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+		
 	}
 
 	@Override

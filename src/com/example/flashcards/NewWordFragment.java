@@ -2,6 +2,7 @@ package com.example.flashcards;
 
 import java.util.List;
 
+import com.example.flashcards.R;
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.entity.Topic;
 import com.example.flashcards.entity.Word;

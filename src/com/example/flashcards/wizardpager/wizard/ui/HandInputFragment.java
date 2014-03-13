@@ -20,6 +20,7 @@ import com.example.flashcards.NewWordFragment;
 import com.example.flashcards.R;
 import com.example.flashcards.wizardpager.wizard.model.HandInputWordPage;
 
+
 import android.app.Activity;
 import android.content.Context;
 import android.os.Bundle;
