@@ -97,6 +97,7 @@ public class TopicChoiceFragment extends ListFragment {
 		Log.d(LOG_TAG, "TopicFragment onCreateView");
 		View rootView = inflater.inflate(R.layout.fragment_page, container,
 				false);
+		Log.d(LOG_TAG, "TopicFragment infalted");
 		((TextView) rootView.findViewById(android.R.id.title)).setText(mPage
 				.getTitle());
 

@@ -6,14 +6,13 @@ import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.app.ActionBar.Tab;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
 
 import com.example.flashcards.R;
 import com.example.flashcards.entity.Dictionary;
-import com.example.flashcards.wizardpager.wizard.model.Page;
-import com.example.flashcards.wizardpager.wizard.ui.PageFragmentCallbacks;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -37,8 +36,8 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 		super.onCreate(savedInstanceState);
-
 		setContentView(R.layout.activity_main);
+		
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
@@ -47,6 +46,9 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
+		
+		ActionBar actionBar = getSupportActionBar();
+        actionBar.setHomeButtonEnabled(false);
 		
 	}
 
@@ -62,7 +64,7 @@ public class MainActivity extends ActionBarActivity implements
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 		transaction.replace(R.id.container,
-				MainFragment.newInstance(dictionary));
+				MainDictionaryFragment.newInstance(dictionary));
 
 		transaction.commit();
 	}
@@ -73,8 +75,9 @@ public class MainActivity extends ActionBarActivity implements
 
 	public void restoreActionBar() {
 		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setDisplayShowTitleEnabled(true);
+		actionBar.setHomeButtonEnabled(true);
 		actionBar.setTitle(mTitle);
 	}
 
@@ -96,10 +99,10 @@ public class MainActivity extends ActionBarActivity implements
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		int id = item.getItemId();
-		if (id == R.id.action_settings) {
-			return true;
-		}
+		//int id = item.getItemId();
+		if (mNavigationDrawerFragment.onOptionsItemSelected(item)) {
+	          return true;
+	        }
 		return super.onOptionsItemSelected(item);
 	}
 

@@ -7,12 +7,14 @@ import android.util.Log;
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.entity.Topic;
 import com.example.flashcards.entity.Word;
+import com.example.flashcards.utilities.DictionaryRandomizer;
 
 public class Controller {
 	private static final String LOG_TAG = "CONTROLLER";
 	private Model model;
 	private static Controller instance;
 	private Dictionary activeDictionary;
+	private DictionaryRandomizer randomizer;
 
 	public Controller() {
 		super();
@@ -37,12 +39,21 @@ public class Controller {
 
 	public void setActiveDictionary(Dictionary dictionary) {
 		this.activeDictionary = dictionary;
+		this.randomizer = new DictionaryRandomizer(activeDictionary);
 
+	}
+
+	public Word getRandomWord() throws Exception {
+		if (randomizer != null)
+			return randomizer.getRandom();
+		else{
+			throw new Exception("Slovník nenastaven");
+		}
 	}
 
 	public void addNewWord(Word word) {
 
-		Log.d(LOG_TAG, "Adding new word: " + word );
+		Log.d(LOG_TAG, "Adding new word: " + word);
 		activeDictionary.addWord(word);
 		Log.d(LOG_TAG, "AddWord activeDict:" + activeDictionary.toStringFull());
 	}
@@ -51,7 +62,7 @@ public class Controller {
 		for (Word word : readImportWords) {
 			addNewWord(word);
 		}
-		
+
 	}
 
 }

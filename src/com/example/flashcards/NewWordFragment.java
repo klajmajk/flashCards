@@ -78,7 +78,7 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 	private void openDictionaryFragment() {
 		FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
 		getActivity().getSupportFragmentManager().popBackStack();
-		transaction.replace(R.id.container, MainFragment.newInstance(Controller.getInstanceOf().getActiveDictionary()));
+		transaction.replace(R.id.container, WordsFragment.newInstance(Controller.getInstanceOf().getActiveDictionary()));
 		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
 		transaction.commit();				
 	}
@@ -91,8 +91,11 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 		Log.d(LOG_TAG, "NewWordFragment onCreateView");
 
 		Log.d(LOG_TAG, "getActivity"+getActivity());
+		
 		View rootView = inflater.inflate(R.layout.activity_wizard, container,
 				false);
+
+		Log.d(LOG_TAG, "inflated");
 
 		// ============================
 		//setContentView(R.layout.activity_wizard);

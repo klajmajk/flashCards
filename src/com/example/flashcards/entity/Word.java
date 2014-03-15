@@ -9,7 +9,7 @@ public class Word  implements Serializable{
 	private String second;
 	private List<String> wordUsage;
 	private Topic topic;
-	private double rating;
+	private int rating;
 	
 	
 	
@@ -50,10 +50,10 @@ public class Word  implements Serializable{
 	public void setWordUsage(List<String> wordUsage) {
 		this.wordUsage = wordUsage;
 	}
-	public double getRating() {
+	public int getProbabilityClass() {
 		return rating;
 	}
-	public void setRating(double rating) {
+	public void setProbablilityClass(int rating) {
 		this.rating = rating;
 	}
 	
