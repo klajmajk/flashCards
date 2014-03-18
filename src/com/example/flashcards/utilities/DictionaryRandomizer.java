@@ -1,30 +1,35 @@
 package com.example.flashcards.utilities;
 
+import java.util.List;
 import java.util.Random;
 
-import com.example.flashcards.entity.Dictionary;
+import android.util.Log;
+
 import com.example.flashcards.entity.Word;
 
 public class DictionaryRandomizer {
-	private Dictionary dictionary;
-    Random rand = new Random();
-    int totalSum = 0;
+	private static final String LOG_TAG = "DictionaryRandomizer";
+    static Random rand = new Random();
 
-    public DictionaryRandomizer(Dictionary dictionary) {
-    	this.dictionary = dictionary;
-        for(Word word : dictionary.getWords()) {
-            totalSum = totalSum + word.getProbabilityClass();            
+
+    public static Word getRandom(List<Word> words) {
+    	Log.d(LOG_TAG, "Words: " + words);
+
+        int totalSum = 0;
+        for(Word word : words) {
+            totalSum = totalSum + word.getProbabilityClass();        
+            Log.d(LOG_TAG, "WOrd: "+ word+" Probability: "+ word.getProbabilityClass());
         }
-    }
-
-    public Word getRandom() {
 
         int index = rand.nextInt(totalSum);
         int sum = 0;
         int i=0;
-        while(sum < index ) {
-             sum = sum + dictionary.getWords().get(i++).getProbabilityClass();
+        while(sum <= index ) {
+             sum = sum + words.get(i++).getProbabilityClass();
         }
-        return dictionary.getWords().get(i-1);
+        Log.d(LOG_TAG, "index: "+index+" i: "+i+" sum: "+sum);
+
+    	Log.d(LOG_TAG, "Getting random form: "+words+" got: "+words.get(i-1) );
+        return words.get(i-1);
     }
 }

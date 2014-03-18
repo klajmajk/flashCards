@@ -15,42 +15,41 @@ public class ImportParser {
 
 	private static final String LOG_TAG = "Import parser";
 
-	public static List<Word> parseCellEntries(List<CellEntry> entries, WorksheetEntry worksheetEntry, char firstCol, char secondCol, String topic) throws ImportErrorException {
+	public static List<Word> parseCellEntries(List<CellEntry> entries,
+			WorksheetEntry worksheetEntry, char firstCol, char secondCol,
+			String topic) {
 		int line = 1;
 		String first = null;
 		String second = null;
 		List<Word> words = new ArrayList<>();
-		for (int i = 0; i < entries.size(); i++) {
-			String itemAddress = entries.get(i).getTitle().getPlainText();
-			Log.d(LOG_TAG, "line: "+line+" itemAddress ss: "+itemAddress.substring(1));
-			if (Integer.parseInt(itemAddress.substring(1)) != line) {
-				// jsme na novém øádku
-				if ((first == null) || (second == null))
-					throw new ImportErrorException(
-							"Importovaný slovník obsahuje prázdná pole");
-				else {
-					Word word = new Word(first, second, null,
-							new Topic(topic));
-					words.add(word);
-					Log.d(LOG_TAG, "importing: " + word.toString());
+			for (int i = 0; i < entries.size(); i++) {
+				String itemAddress = entries.get(i).getTitle().getPlainText();
+				Log.d(LOG_TAG, "line: " + line + " itemAddress ss: "
+						+ itemAddress+ " first: "+first+ " second: "+second);
+				if (Integer.parseInt(itemAddress.substring(1)) != line) {
+					// jsme na novém øádku
+					if (!((first == null) || (second == null))){
+						Word word = new Word(first, second, null, new Topic(
+								topic));
+						words.add(word);
+						Log.d(LOG_TAG, "importing: " + word.toString());
+					}
+
 					line++;
 				}
-			}
-			if ((itemAddress.charAt(0) == firstCol) &&
-			// TODO tady by to chtelo chytreji
-					(line == Integer.parseInt(itemAddress
-							.substring(1)))) {
-				first = entries.get(i).getPlainTextContent();
-			}
+				if ((itemAddress.charAt(0) == firstCol) &&
+				// TODO tady by to chtelo chytreji
+						(line == Integer.parseInt(itemAddress.substring(1)))) {
+					first = entries.get(i).getPlainTextContent();
+				}
 
-			if ((itemAddress.charAt(0) == secondCol) &&
-			// TODO tady by to chtelo chytreji
-					(line == Integer.parseInt(itemAddress
-							.substring(1)))) {
-				second = entries.get(i).getPlainTextContent();
+				if ((itemAddress.charAt(0) == secondCol) &&
+				// TODO tady by to chtelo chytreji
+						(line == Integer.parseInt(itemAddress.substring(1)))) {
+					second = entries.get(i).getPlainTextContent();
+				}
 			}
-			// Print the cell's address in A1 notation
-		}
+		
 		return words;
 	}
 

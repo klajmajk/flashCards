@@ -80,20 +80,13 @@ public class HandInputFragment extends Fragment {
 
     @Override
     public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    	super.onAttach(activity);
 
-        if (activity instanceof ActionBarActivity) {
-			NewWordFragment fragment = (NewWordFragment) ((ActionBarActivity) activity)
-					.getSupportFragmentManager().findFragmentById(
-							R.id.container);
+        if (!(activity instanceof PageFragmentCallbacks)) {
+            throw new ClassCastException("Activity must implement PageFragmentCallbacks");
+        }
 
-			if (!(fragment instanceof PageFragmentCallbacks)) {
-				throw new ClassCastException(
-						"Activity must implement PageFragmentCallbacks");
-			}
-
-			mCallbacks = (PageFragmentCallbacks) fragment;
-		}
+        mCallbacks = (PageFragmentCallbacks) activity;
     }
 
     @Override

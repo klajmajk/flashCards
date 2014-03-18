@@ -21,6 +21,11 @@ import android.view.ViewGroup;
 public class MainDictionaryFragment extends Fragment implements
 		ActionBar.TabListener {
 	private Fragment mFragment;
+	private static final int NUM_PAGES = 2;
+	private static final String LOG_TAG = "MainDictionaryFragment";
+	private ViewPager mPager;
+	private PagerAdapter mPagerAdapter;
+	private ActionBar actionBar;
 
 	public static MainDictionaryFragment newInstance(Dictionary dictionary) {
 
@@ -32,24 +37,8 @@ public class MainDictionaryFragment extends Fragment implements
 		fragment.setArguments(args);
 		return fragment;
 	}
-
-	/**
-	 * The number of pages (wizard steps) to show in this demo.
-	 */
-	private static final int NUM_PAGES = 2;
-
-	private static final String LOG_TAG = "MainDictionaryFragment";
-
-	/**
-	 * The pager widget, which handles animation and allows swiping horizontally
-	 * to access previous and next wizard steps.
-	 */
-	private ViewPager mPager;
-
-	/**
-	 * The pager adapter, which provides the pages to the view pager widget.
-	 */
-	private PagerAdapter mPagerAdapter;
+	
+	
 
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
@@ -59,12 +48,13 @@ public class MainDictionaryFragment extends Fragment implements
 				container, false);
 		// Instantiate a ViewPager and a PagerAdapter.
 		mPager = (ViewPager) rootView.findViewById(R.id.dictionary_pager);
-		mPagerAdapter = new ScreenSlidePagerAdapter(getActivity()
-				.getSupportFragmentManager());
+		mPagerAdapter = new ScreenSlidePagerAdapter(getChildFragmentManager());
 		Log.d(LOG_TAG, "mPager " + mPager + " mPagerAdapter " + mPagerAdapter);
 		mPager.setAdapter(mPagerAdapter);
-		final ActionBar actionBar = ((ActionBarActivity) getActivity())
-				.getSupportActionBar();
+
+		final ActionBar actionBar = ((ActionBarActivity)getActivity()).getSupportActionBar();
+
+		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		Tab tab = actionBar.newTab().setText("Slovník").setTabListener(this);
 		actionBar.removeAllTabs();
 		actionBar.addTab(tab);
@@ -105,10 +95,19 @@ public class MainDictionaryFragment extends Fragment implements
 	public void onCreate(Bundle savedInstanceState) {
 		// TODO Auto-generated method stub
 		super.onCreate(savedInstanceState);
-		
+	}	
+	
+	
+	
 
-
+	@Override
+	public void onResume() {
+		// TODO Auto-generated method stub
+		super.onResume();
 	}
+
+
+
 
 	/**
 	 * A simple pager adapter that represents 5 ScreenSlidePageFragment objects,

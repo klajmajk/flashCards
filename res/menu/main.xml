@@ -8,8 +8,8 @@
         android:title="@string/action_add_word"
         app:showAsAction="never"/>
     <item
-        android:id="@+id/action_test"
-        android:title="test"
+        android:id="@+id/action_import"
+        android:title="Import Google docs"
         app:showAsAction="never"/>
     <item
         android:id="@+id/action_settings"

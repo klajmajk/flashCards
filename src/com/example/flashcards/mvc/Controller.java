@@ -1,12 +1,17 @@
 package com.example.flashcards.mvc;
 
+import java.io.Serializable;
+import java.util.ArrayList;
 import java.util.List;
 
+import android.R.bool;
+import android.content.Context;
 import android.util.Log;
 
 import com.example.flashcards.entity.Dictionary;
 import com.example.flashcards.entity.Topic;
 import com.example.flashcards.entity.Word;
+import com.example.flashcards.persistence.Persistence;
 import com.example.flashcards.utilities.DictionaryRandomizer;
 
 public class Controller {
@@ -15,6 +20,10 @@ public class Controller {
 	private static Controller instance;
 	private Dictionary activeDictionary;
 	private DictionaryRandomizer randomizer;
+	private Word activeWord;
+	private boolean fromFirst;
+	private List<Word> sessionWords;
+	private Context context;
 
 	public Controller() {
 		super();
@@ -27,6 +36,11 @@ public class Controller {
 		}
 		return instance;
 
+	}	
+
+	public void setContext(Context context) {
+		this.context = context;
+		readPersistentData();
 	}
 
 	public Model getModel() {
@@ -39,30 +53,84 @@ public class Controller {
 
 	public void setActiveDictionary(Dictionary dictionary) {
 		this.activeDictionary = dictionary;
-		this.randomizer = new DictionaryRandomizer(activeDictionary);
+		Log.d(LOG_TAG, "Setting active dict: "+dictionary);
 
 	}
 
-	public Word getRandomWord() throws Exception {
-		if (randomizer != null)
-			return randomizer.getRandom();
-		else{
-			throw new Exception("Slovník nenastaven");
-		}
+	
+	
+	public void fromFirst(boolean fromFirst){
+		this.fromFirst = fromFirst;
 	}
 
 	public void addNewWord(Word word) {
-
-		Log.d(LOG_TAG, "Adding new word: " + word);
 		activeDictionary.addWord(word);
-		Log.d(LOG_TAG, "AddWord activeDict:" + activeDictionary.toStringFull());
+		persist();
 	}
 
 	public void addImportWords(List<Word> readImportWords) {
 		for (Word word : readImportWords) {
-			addNewWord(word);
+			activeDictionary.addWord(word);
 		}
+		persist();
 
+	}
+
+	public String getFirstText() {
+		try {
+			activeWord = DictionaryRandomizer.getRandom(sessionWords);
+
+			Log.d(LOG_TAG, "getFirstText activeWord: "+ activeWord);
+			if(fromFirst) return activeWord.getFirst();
+			else return activeWord.getSecond();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+	
+	public String getSecondText() {
+		try {
+			Log.d(LOG_TAG, "activeWord activeWord: "+ activeWord);
+			if(fromFirst) return activeWord.getSecond();
+			else return activeWord.getFirst();
+		} catch (Exception e) {
+			e.printStackTrace();
+		}
+		return null;
+	}
+
+	public void wrongAnswer() {
+		int probabilityClass = activeWord.getProbabilityClass();
+		if(probabilityClass<5) activeWord.setProbablilityClass(probabilityClass+1);
+		
+	}
+
+	public void correctAnswer() {
+		int probabilityClass = activeWord.getProbabilityClass();
+		if(probabilityClass>1) activeWord.setProbablilityClass(probabilityClass-1);
+		
+	}
+
+	public void startLearningSession(List<Topic> topics, boolean fromFirst) {
+		this.fromFirst = fromFirst;
+		sessionWords = new ArrayList<>();
+		Log.d(LOG_TAG, "Chosen topics: "+topics);
+		for (Word word : activeDictionary.getWords()) {
+			if(topics.contains(word.getTopic())) sessionWords.add(word);
+		}
+		Log.d(LOG_TAG, "seesionWord settup to: "+ sessionWords);
+	}
+	
+	public void persist(){
+		Persistence.save((Serializable) model.getDictionaries(), context);
+	}
+	
+	public void readPersistentData(){
+		List<Dictionary> dicts = (List<Dictionary>)Persistence.read(context);
+		model.setDictionaries(dicts);
+		Log.d(LOG_TAG, "Dictionaries loaded: "+model.getDictionaries());
+		
 	}
 
 }

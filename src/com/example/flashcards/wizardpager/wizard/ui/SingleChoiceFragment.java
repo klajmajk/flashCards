@@ -113,24 +113,13 @@ public class SingleChoiceFragment extends ListFragment {
 
     @Override
     public void onAttach(Activity activity) {
-        super.onAttach(activity);
+    	super.onAttach(activity);
 
-        Log.d(LOG_TAG, activity.toString());
-        if (activity instanceof MainActivity) {
-			NewWordFragment fragment = (NewWordFragment) ((ActionBarActivity) activity)
-					.getSupportFragmentManager().findFragmentById(
-							R.id.container);
+        if (!(activity instanceof PageFragmentCallbacks)) {
+            throw new ClassCastException("Activity must implement PageFragmentCallbacks");
+        }
 
-			if (!(fragment instanceof PageFragmentCallbacks)) {
-				throw new ClassCastException(
-						"Activity must implement PageFragmentCallbacks");
-			}
-
-			mCallbacks = (PageFragmentCallbacks) fragment;
-		}else{
-			throw new ClassCastException(
-					"Fuck Activity must implement PageFragmentCallbacks");
-		}
+        mCallbacks = (PageFragmentCallbacks) activity;
     }
 
     @Override

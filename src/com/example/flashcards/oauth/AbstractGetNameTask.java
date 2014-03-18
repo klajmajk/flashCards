@@ -58,7 +58,8 @@ import java.util.List;
  * Display personalized greeting. This class contains boilerplate code to
  * consume the token but isn't integral to getting the tokens.
  */
-public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void> {
+public abstract class AbstractGetNameTask extends
+		AsyncTask<Activity, Void, Void> {
 	private static final String TAG = "TokenInfoTask";
 	private static final String NAME_KEY = "given_name";
 	private static final String LOG_TAG = "AbstractGetNameTask";
@@ -94,20 +95,25 @@ public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void
 	@Override
 	protected Void doInBackground(Activity... activities) {
 		try {
-			String first = ((EditText)activities[0].findViewById(R.id.firstEditText)).getText().toString().trim().toUpperCase();
-			String second = ((EditText)activities[0].findViewById(R.id.secondEditText)).getText().toString().trim().toUpperCase();
-			String name = ((EditText)activities[0].findViewById(R.id.sheet_name)).getText().toString().trim();
-			Log.d(LOG_TAG,first+second);
-			if((first.length() == 1)&&(second.length() == 1)&&
-					((first.charAt(0)>='A')&&(first.charAt(0)<='Z'))&&
-					((second.charAt(0)>='A')&&(second.charAt(0)<='Z'))&&
-					(name.length()>0)){
-				fetchSheetsFromGoogle(name,first.charAt(0), second.charAt(0));
+			String first = ((EditText) activities[0]
+					.findViewById(R.id.firstEditText)).getText().toString()
+					.trim().toUpperCase();
+			String second = ((EditText) activities[0]
+					.findViewById(R.id.secondEditText)).getText().toString()
+					.trim().toUpperCase();
+			String name = ((EditText) activities[0]
+					.findViewById(R.id.sheet_name)).getText().toString().trim();
+			Log.d(LOG_TAG, first + second);
+			if ((first.length() == 1) && (second.length() == 1)
+					&& ((first.charAt(0) >= 'A') && (first.charAt(0) <= 'Z'))
+					&& ((second.charAt(0) >= 'A') && (second.charAt(0) <= 'Z'))
+					&& (name.length() > 0)) {
+				fetchSheetsFromGoogle(name, first.charAt(0), second.charAt(0));
 				activities[0].finish();
-				
-			}else onError("Chybný formát zadaných parametrù", null);
-			
-			
+
+			} else
+				onError("Chybný formát zadaných parametrù", null);
+
 		} catch (IOException ex) {
 			onError("Following Error occured, please try again. "
 					+ ex.getMessage(), ex);
@@ -117,8 +123,7 @@ public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void
 			onError("Nepodaøilo se naèíst data " + e.getMessage(), e);
 			e.printStackTrace();
 		} catch (ImportErrorException e) {
-			onError("Formát dat: " + e.getMessage(), e);
-			// e.printStackTrace();
+			onError("Import Error " + e.getMessage(), e);
 		}
 		return null;
 	}
@@ -136,9 +141,9 @@ public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void
 	 */
 	protected abstract String fetchToken() throws IOException;
 
-	private void fetchSheetsFromGoogle(String name, char firstCol, char secondCol)
-			throws IOException, JSONException, ServiceException,
-			ImportErrorException {
+	private void fetchSheetsFromGoogle(String name, char firstCol,
+			char secondCol) throws IOException, JSONException,
+			ServiceException, ImportErrorException {
 		String token = fetchToken();
 		if (token == null) {
 			// error has already been handled in fetchToken()
@@ -153,20 +158,22 @@ public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void
 				"https://spreadsheets.google.com/feeds/spreadsheets/private/full");
 		SpreadsheetFeed feed = service.getFeed(metafeedUrl,
 				SpreadsheetFeed.class);
-		// TODO slovíèkajsou hnus
-		SpreadsheetEntry wordsFile = getWordsSheet(name,
-				feed.getEntries());
-		Controller.getInstanceOf().addImportWords(
-				readImportWords(wordsFile, service, firstCol, secondCol));
+		
+		SpreadsheetEntry wordsFile = getWordsSheet(name, feed.getEntries());
+		List<Word> list = readImportWords(wordsFile, service, firstCol,
+				secondCol);
+		Controller.getInstanceOf().addImportWords(list);
+		
 
-		Log.d(LOG_TAG,"first:"+ firstCol+secondCol);
+		Log.d(LOG_TAG, "first:" + firstCol + secondCol);
 		return;
 	}
 
 	private List<Word> readImportWords(SpreadsheetEntry wordsFile,
 			SpreadsheetService service, char firstCol, char secondCol)
-			throws ImportErrorException {
+			{
 		WorksheetFeed worksheetFeed;
+		List<Word> result = new ArrayList<>();
 		try {
 			worksheetFeed = service.getFeed(wordsFile.getWorksheetFeedUrl(),
 					WorksheetFeed.class);
@@ -183,12 +190,14 @@ public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void
 
 					// Iterate through each cell, printing its value.
 					List<CellEntry> entries = cellFeed.getEntries();
-					//Importing takes place here
+					// Importing takes place here
 
-					Log.d(LOG_TAG,"first:"+ firstCol+secondCol);
-					return ImportParser.parseCellEntries(entries,
+					List<Word> toAdd = ImportParser.parseCellEntries(entries,
 							worksheetEntry, firstCol, secondCol, worksheetEntry
 									.getTitle().getPlainText());
+
+					Log.d(LOG_TAG, "toAdd:" + toAdd.toString());
+					result.addAll(toAdd);
 				} catch (URISyntaxException e) {
 					// TODO Auto-generated catch block
 					e.printStackTrace();
@@ -199,16 +208,16 @@ public abstract class AbstractGetNameTask extends AsyncTask<Activity, Void, Void
 			// TODO Auto-generated catch block
 			e.printStackTrace();
 		}
-		return null;
+		return result;
 	}
 
 	private SpreadsheetEntry getWordsSheet(String name,
-			List<SpreadsheetEntry> entries) {
+			List<SpreadsheetEntry> entries) throws ImportErrorException {
 		for (SpreadsheetEntry spreadsheetEntry : entries) {
 			if (spreadsheetEntry.getTitle().getPlainText().equals(name))
 				return spreadsheetEntry;
 		}
-		return null;
+		throw new ImportErrorException("Zvolený soubor neexistuje");
 	}
 
 	/**

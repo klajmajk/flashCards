@@ -31,6 +31,7 @@ import android.support.v4.app.FragmentStatePagerAdapter;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.view.ViewPager;
 import android.util.Log;
+import android.util.SparseArray;
 import android.util.TypedValue;
 import android.view.LayoutInflater;
 import android.view.View;
@@ -48,7 +49,8 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 
 	private boolean mEditingAfterReview;
 
-	private AbstractWizardModel mWizardModel = new NewWordWizardModel(getActivity());
+	private AbstractWizardModel mWizardModel = new NewWordWizardModel(
+			getActivity());
 
 	private boolean mConsumePageSelectedEvent;
 
@@ -66,21 +68,28 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 	public NewWordFragment() {
 		super();
 	}
-	
-	private Bundle getJointBundle(){
+
+	private Bundle getJointBundle() {
 		Bundle result = new Bundle();
 		for (Page page : mCurrentPageSequence) {
 			result.putAll(page.getData());
 		}
 		return result;
 	}
-	
+
 	private void openDictionaryFragment() {
-		FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
-		getActivity().getSupportFragmentManager().popBackStack();
-		transaction.replace(R.id.container, WordsFragment.newInstance(Controller.getInstanceOf().getActiveDictionary()));
+
+		FragmentTransaction transaction = getActivity()
+				.getSupportFragmentManager().beginTransaction();
+		Fragment f = getActivity().getSupportFragmentManager()
+				.findFragmentById(R.id.container);
+		Log.d(LOG_TAG, "FragmentToDestroy: " + f);
+		/*getActivity().getSupportFragmentManager().popBackStack(null,
+				FragmentManager.POP_BACK_STACK_INCLUSIVE);*/
+		transaction.replace(R.id.container, MainDictionaryFragment
+				.newInstance(Controller.getInstanceOf().getActiveDictionary()));
 		transaction.setTransition(FragmentTransaction.TRANSIT_FRAGMENT_CLOSE);
-		transaction.commit();				
+		transaction.commit();
 	}
 
 	// Here the content is put in
@@ -90,15 +99,15 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 
 		Log.d(LOG_TAG, "NewWordFragment onCreateView");
 
-		Log.d(LOG_TAG, "getActivity"+getActivity());
-		
+		Log.d(LOG_TAG, "getActivity" + getActivity());
+
 		View rootView = inflater.inflate(R.layout.activity_wizard, container,
 				false);
 
 		Log.d(LOG_TAG, "inflated");
 
 		// ============================
-		//setContentView(R.layout.activity_wizard);
+		// setContentView(R.layout.activity_wizard);
 
 		if (savedInstanceState != null) {
 			mWizardModel.load(savedInstanceState.getBundle("model"));
@@ -106,13 +115,13 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 
 		mWizardModel.registerListener(this);
 
-		mPagerAdapter = new MyPagerAdapter(getActivity().getSupportFragmentManager());
+		mPagerAdapter = new MyPagerAdapter(getActivity()
+				.getSupportFragmentManager());
 		mPager = (ViewPager) rootView.findViewById(R.id.pager);
 
 		mStepPagerStrip = (StepPagerStrip) rootView.findViewById(R.id.strip);
 		mPager.setAdapter(mPagerAdapter);
-		
-		
+
 		mStepPagerStrip
 				.setOnPageSelectedListener(new StepPagerStrip.OnPageSelectedListener() {
 					@Override
@@ -158,13 +167,16 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 				}
 			}
 
-			
-
 			private void callNewWord() {
-				String first = getJointBundle().getString(HandInputWordPage.FIRST);
-				String second = getJointBundle().getString(HandInputWordPage.SECOND);
-				Topic topic = (Topic)getJointBundle().getSerializable(SingleTopicChoicePage.TOPIC);
-				Controller.getInstanceOf().addNewWord(new Word(first, second, null, topic) );				
+				String first = getJointBundle().getString(
+						HandInputWordPage.FIRST);
+				String second = getJointBundle().getString(
+						HandInputWordPage.SECOND);
+				Topic topic = (Topic) getJointBundle().getSerializable(
+						SingleTopicChoicePage.TOPIC);
+				Controller.getInstanceOf().addNewWord(
+						new Word(first, second, null, topic));
+				Controller.getInstanceOf().persist();
 			}
 		});
 
@@ -186,11 +198,11 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
 		Log.d(LOG_TAG, " onAttach");
-		//TODO tady musim obnovit i ty co sou pod ni
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
-		//!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// TODO tady musim obnovit i ty co sou pod ni
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
+		// !!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!
 	}
 
 	@Override
@@ -209,15 +221,16 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 		if (position == mCurrentPageSequence.size()) {
 			mNextButton.setText(R.string.finish);
 			mNextButton.setBackgroundResource(R.drawable.finish_background);
-			mNextButton.setTextAppearance(getActivity(), R.style.TextAppearanceFinish);
+			mNextButton.setTextAppearance(getActivity(),
+					R.style.TextAppearanceFinish);
 		} else {
 			mNextButton.setText(mEditingAfterReview ? R.string.review
 					: R.string.next);
 			mNextButton
 					.setBackgroundResource(R.drawable.selectable_item_background);
 			TypedValue v = new TypedValue();
-			getActivity().getTheme().resolveAttribute(android.R.attr.textAppearanceMedium, v,
-					true);
+			getActivity().getTheme().resolveAttribute(
+					android.R.attr.textAppearanceMedium, v, true);
 			mNextButton.setTextAppearance(getActivity(), v.resourceId);
 			mNextButton.setEnabled(position != mPagerAdapter.getCutOffPage());
 		}
@@ -228,6 +241,17 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 
 	@Override
 	public void onDestroy() {
+		Log.d(LOG_TAG, "Destroying new word fragment  pagerAdapter count: "
+				+ mPagerAdapter.getCount());
+		FragmentTransaction transaction = getActivity().getSupportFragmentManager().beginTransaction();
+		for (int i = 0; i < mPagerAdapter.getCount(); i++) {
+			transaction.remove(mPagerAdapter.getRegisteredFragments(i));			
+		}
+
+		mPager.removeAllViews();
+		
+		transaction.commit();
+		// mPagerAdapter.notifyDataSetChanged();
 		super.onDestroy();
 		mWizardModel.unregisterListener(this);
 	}
@@ -270,29 +294,31 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 	public Page onGetPage(String key) {
 		return mWizardModel.findByKey(key);
 	}
-	
+
 	private boolean recalculateCutOffPage() {
-        // Cut off the pager adapter at first required page that isn't completed
-        int cutOffPage = mCurrentPageSequence.size() + 1;
-        for (int i = 0; i < mCurrentPageSequence.size(); i++) {
-            Page page = mCurrentPageSequence.get(i);
-            if (page.isRequired() && !page.isCompleted()) {
-                cutOffPage = i;
-                break;
-            }
-        }
+		// Cut off the pager adapter at first required page that isn't completed
+		int cutOffPage = mCurrentPageSequence.size() + 1;
+		for (int i = 0; i < mCurrentPageSequence.size(); i++) {
+			Page page = mCurrentPageSequence.get(i);
+			if (page.isRequired() && !page.isCompleted()) {
+				cutOffPage = i;
+				break;
+			}
+		}
 
-        if (mPagerAdapter.getCutOffPage() != cutOffPage) {
-            mPagerAdapter.setCutOffPage(cutOffPage);
-            return true;
-        }
+		if (mPagerAdapter.getCutOffPage() != cutOffPage) {
+			mPagerAdapter.setCutOffPage(cutOffPage);
+			return true;
+		}
 
-        return false;
-    }
+		return false;
+	}
 
 	public class MyPagerAdapter extends FragmentStatePagerAdapter {
 		private int mCutOffPage;
 		private Fragment mPrimaryItem;
+
+		SparseArray<Fragment> registeredFragments = new SparseArray<Fragment>();
 
 		public MyPagerAdapter(FragmentManager fm) {
 			super(fm);
@@ -301,7 +327,10 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 		@Override
 		public Fragment getItem(int i) {
 			if (i >= mCurrentPageSequence.size()) {
-				return new ReviewFragment();
+				Fragment f = new ReviewFragment();
+				Log.d(LOG_TAG, "getting new instance of Review Fragment");
+				f.setRetainInstance(false);
+				return f;
 			}
 
 			return mCurrentPageSequence.get(i).createFragment();
@@ -314,7 +343,6 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 				// Re-use the current fragment (its position never changes)
 				return POSITION_UNCHANGED;
 			}
-
 			return POSITION_NONE;
 		}
 
@@ -343,5 +371,24 @@ public class NewWordFragment extends Fragment implements PageFragmentCallbacks,
 		public int getCutOffPage() {
 			return mCutOffPage;
 		}
+
+		@Override
+		public Object instantiateItem(ViewGroup container, int position) {
+			Fragment fragment = (Fragment) super.instantiateItem(container,
+					position);
+			registeredFragments.put(position, fragment);
+			return fragment;
+		}
+
+		@Override
+		public void destroyItem(ViewGroup container, int position, Object object) {
+			registeredFragments.remove(position);
+			super.destroyItem(container, position, object);
+		}
+
+		public Fragment getRegisteredFragments(int i) {
+			return registeredFragments.get(i);
+		}
+
 	}
 }

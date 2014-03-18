@@ -129,21 +129,12 @@ public class TopicChoiceFragment extends ListFragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		if (activity instanceof MainActivity) {
-			NewWordFragment fragment = (NewWordFragment) ((ActionBarActivity) activity)
-					.getSupportFragmentManager().findFragmentById(
-							R.id.container);
 
-			if (!(fragment instanceof PageFragmentCallbacks)) {
-				throw new ClassCastException(
-						"Activity must implement PageFragmentCallbacks");
-			}
+        if (!(activity instanceof PageFragmentCallbacks)) {
+            throw new ClassCastException("Activity must implement PageFragmentCallbacks");
+        }
 
-			mCallbacks = (PageFragmentCallbacks) fragment;
-		} else {
-			throw new ClassCastException(
-					"Fuck Activity must implement PageFragmentCallbacks");
-		}
+        mCallbacks = (PageFragmentCallbacks) activity;
 	}
 
 	@Override

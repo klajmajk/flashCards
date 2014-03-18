@@ -1,6 +1,11 @@
 package com.example.flashcards;
 
+import java.lang.ref.WeakReference;
+import java.util.ArrayList;
+import java.util.List;
+
 import android.os.Bundle;
+import android.support.v4.app.Fragment;
 import android.support.v4.app.FragmentManager;
 import android.support.v4.app.FragmentTransaction;
 import android.support.v4.widget.DrawerLayout;
@@ -10,9 +15,11 @@ import android.support.v7.app.ActionBar.Tab;
 import android.util.Log;
 import android.view.Menu;
 import android.view.MenuItem;
+import android.view.View;
 
 import com.example.flashcards.R;
 import com.example.flashcards.entity.Dictionary;
+import com.example.flashcards.mvc.Controller;
 
 public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
@@ -24,6 +31,7 @@ public class MainActivity extends ActionBarActivity implements
 	 * navigation drawer.
 	 */
 	private NavigationDrawerFragment mNavigationDrawerFragment;
+	private MainDictionaryFragment dictFragment;
 
 	/**
 	 * Used to store the last screen title. For use in
@@ -32,12 +40,15 @@ public class MainActivity extends ActionBarActivity implements
 	private CharSequence mTitle;
 
 	private Dictionary activeDictionary;
+	List<WeakReference<Fragment>> fragList = new ArrayList<WeakReference<Fragment>>();
 
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
+
+		// TODO tohle je docasne reseni jak se zbavit obnoveni starych fragmentu
 		super.onCreate(savedInstanceState);
+		Controller.getInstanceOf().setContext(this);
 		setContentView(R.layout.activity_main);
-		
 
 		mNavigationDrawerFragment = (NavigationDrawerFragment) getSupportFragmentManager()
 				.findFragmentById(R.id.navigation_drawer);
@@ -46,10 +57,10 @@ public class MainActivity extends ActionBarActivity implements
 		// Set up the drawer.
 		mNavigationDrawerFragment.setUp(R.id.navigation_drawer,
 				(DrawerLayout) findViewById(R.id.drawer_layout));
-		
+
 		ActionBar actionBar = getSupportActionBar();
-        actionBar.setHomeButtonEnabled(false);
-		
+		actionBar.setHomeButtonEnabled(false);
+
 	}
 
 	@Override
@@ -63,8 +74,9 @@ public class MainActivity extends ActionBarActivity implements
 		// update the main content by replacing fragments
 		FragmentManager fragmentManager = getSupportFragmentManager();
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
-		transaction.replace(R.id.container,
-				MainDictionaryFragment.newInstance(dictionary));
+
+		dictFragment = MainDictionaryFragment.newInstance(dictionary);
+		transaction.replace(R.id.container, dictFragment);
 
 		transaction.commit();
 	}
@@ -75,7 +87,6 @@ public class MainActivity extends ActionBarActivity implements
 
 	public void restoreActionBar() {
 		ActionBar actionBar = getSupportActionBar();
-		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_TABS);
 		actionBar.setDisplayShowTitleEnabled(true);
 		actionBar.setHomeButtonEnabled(true);
 		actionBar.setTitle(mTitle);
@@ -99,15 +110,36 @@ public class MainActivity extends ActionBarActivity implements
 		// Handle action bar item clicks here. The action bar will
 		// automatically handle clicks on the Home/Up button, so long
 		// as you specify a parent activity in AndroidManifest.xml.
-		//int id = item.getItemId();
+		// int id = item.getItemId();
+		Log.d(LOG_TAG, "item selected start");
 		if (mNavigationDrawerFragment.onOptionsItemSelected(item)) {
-	          return true;
-	        }
+			return true;
+		}
+
+		Log.d(LOG_TAG, "item selected end");
 		return super.onOptionsItemSelected(item);
 	}
 
-	/**
-	 * A placeholder fragment containing a simple view.
-	 */
+	@Override
+	public void onAttachFragment(Fragment fragment) {
+		// TODO Auto-generated method stub
+		super.onAttachFragment(fragment);
+
+		fragList.add(new WeakReference(fragment));
+		Log.d(LOG_TAG, "running fragments: " + getActiveFragments());
+	}
+
+	public List<Fragment> getActiveFragments() {
+		ArrayList<Fragment> ret = new ArrayList<Fragment>();
+		for (WeakReference<Fragment> ref : fragList) {
+			Fragment f = ref.get();
+			if (f != null) {
+				if (f.isVisible()) {
+					ret.add(f);
+				}
+			}
+		}
+		return ret;
+	}
 
 }

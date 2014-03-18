@@ -42,7 +42,6 @@ import android.widget.Toast;
  */
 public class NavigationDrawerFragment extends Fragment {
 
-	Model model = Controller.getInstanceOf().getModel();
 
 	/**
 	 * Remember the position of the selected item.
@@ -93,8 +92,7 @@ public class NavigationDrawerFragment extends Fragment {
 
 		if (savedInstanceState != null) {
 			// reads selected dictionary from persistent memory
-			selectedDictionary = model.getDictionaries().get(
-					savedInstanceState.getInt(STATE_SELECTED_POSITION));
+			selectedDictionary = Controller.getInstanceOf().getActiveDictionary();
 			mFromSavedInstanceState = true;
 		} else {
 			// Select either the default item (0) or the last selected item.
@@ -133,7 +131,7 @@ public class NavigationDrawerFragment extends Fragment {
 				android.R.id.text1, list.toArray(new Dictionary[list.size()])));
 
 		mDrawerListView.setItemChecked(
-				model.getDictionaries().indexOf(selectedDictionary), true);
+				Controller.getInstanceOf().getModel().getDictionaries().indexOf(selectedDictionary), true);
 		return mDrawerListView;
 	}
 
@@ -235,12 +233,12 @@ public class NavigationDrawerFragment extends Fragment {
 
 	private void dictionarySelected(Dictionary dictionary) {
 		if (dictionary == null)
-			dictionary = model.getDictionaries().get(0);
+			dictionary = Controller.getInstanceOf().getModel().getDictionaries().get(0);
 		Log.d(NAVIGATION_DRAWER, "dictionarySelected dictionary: " + dictionary);
 		selectedDictionary = dictionary;
 		if (mDrawerListView != null) {
 			mDrawerListView.setItemChecked(
-					model.getDictionaries().indexOf(dictionary), true);
+					Controller.getInstanceOf().getModel().getDictionaries().indexOf(dictionary), true);
 		}
 		if (mDrawerLayout != null) {
 			mDrawerLayout.closeDrawer(mFragmentContainerView);
@@ -271,7 +269,7 @@ public class NavigationDrawerFragment extends Fragment {
 	@Override
 	public void onSaveInstanceState(Bundle outState) {
 		super.onSaveInstanceState(outState);
-		outState.putInt(STATE_SELECTED_POSITION, model.getDictionaries()
+		outState.putInt(STATE_SELECTED_POSITION, Controller.getInstanceOf().getModel().getDictionaries()
 				.indexOf(selectedDictionary));
 	}
 
@@ -300,21 +298,15 @@ public class NavigationDrawerFragment extends Fragment {
 		if (mDrawerToggle.onOptionsItemSelected(item)) {
 			return true;
 		}
-
 		if (item.getItemId() == R.id.action_add_word) {
-			// Open new word wizard
-			Log.d(LOG_TAG, "getActivity()" + getActivity());
-			FragmentManager fragmentManager = getActivity()
-					.getSupportFragmentManager();
-
-			FragmentTransaction transaction = fragmentManager.beginTransaction();
-			transaction.addToBackStack(null);
-			transaction.replace(R.id.container, NewWordFragment.newInstance())
-					.commit();
+			Intent intent = new Intent(getActivity(), WizardActivity.class);
+			startActivity(intent);
 			return true;
-		}else if(item.getItemId() == R.id.action_test){
+		} else if (item.getItemId() == R.id.action_import) {
+			Log.d(LOG_TAG, "staring hello activity");
 			Intent myIntent = new Intent(getActivity(), HelloActivity.class);
 			getActivity().startActivity(myIntent);
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);

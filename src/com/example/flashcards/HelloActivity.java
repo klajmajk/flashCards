@@ -55,6 +55,7 @@ public class HelloActivity extends Activity {
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
     static final int REQUEST_CODE_RECOVER_FROM_AUTH_ERROR = 1001;
     static final int REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR = 1002;
+	private static final String LOG_TAG = "HelloActivity";
 
     private String mEmail;
 
@@ -65,7 +66,8 @@ public class HelloActivity extends Activity {
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-        super.onCreate(savedInstanceState);
+    	Log.d(LOG_TAG, "Creating hello activity");
+    	super.onCreate(savedInstanceState);
         setContentView(R.layout.accounts_tester);
 
         mOut = (TextView) findViewById(R.id.message);
@@ -165,6 +167,8 @@ public class HelloActivity extends Activity {
             public void run() {
             	 AlertDialog.Builder builder = new AlertDialog.Builder(mContext);
             	 builder.setMessage(message);
+            	 builder.setTitle("Chyba");
+            	 builder.setNeutralButton("OK", null);
             	 AlertDialog alert = builder.create();
                  alert.show();
             }

@@ -9,6 +9,7 @@ public class Word  implements Serializable{
 	private String second;
 	private List<String> wordUsage;
 	private Topic topic;
+	//pravdìpodobnost zobrazení 5 nejèastìji (neumím) 1 nejménì èasto (umím)
 	private int rating;
 	
 	
@@ -19,7 +20,7 @@ public class Word  implements Serializable{
 		this.first = first;
 		this.second = second;
 		this.wordUsage = wordUsage;
-		this.rating = 0;
+		this.rating = 5;
 		this.topic = topic;
 	}
 	
@@ -27,7 +28,7 @@ public class Word  implements Serializable{
 	
 	public Word() {
 		super();
-		this.rating = 0;
+		this.rating = 1;
 	}
 
 
@@ -57,10 +58,6 @@ public class Word  implements Serializable{
 		this.rating = rating;
 	}
 	
-	
-
-
-
 	public Topic getTopic() {
 		return topic;
 	}
