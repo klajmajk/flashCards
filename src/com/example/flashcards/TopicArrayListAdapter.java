@@ -1,5 +1,7 @@
 package com.example.flashcards;
 
+import java.math.RoundingMode;
+import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -18,6 +20,7 @@ import android.widget.ListAdapter;
 import android.widget.TextView;
 
 import com.example.flashcards.entity.Topic;
+import com.example.flashcards.mvc.Controller;
 
 public class TopicArrayListAdapter extends ArrayAdapter<Topic>{
 	private List<Topic> topics;
@@ -75,6 +78,17 @@ public class TopicArrayListAdapter extends ArrayAdapter<Topic>{
 		convertView.setFocusable(false);
 		CheckBox mCheckBox = (CheckBox) convertView
 				.findViewById(R.id.topic_checkBox);
+		TextView firstLearned = (TextView) convertView
+				.findViewById(R.id.learned_first_textView);
+		TextView secondLearned = (TextView) convertView
+				.findViewById(R.id.learned_second_textView);
+		double [] learned = Controller.getInstanceOf().getActiveTopicLearned(getItem(position));
+
+        DecimalFormat df = new DecimalFormat("#.#");
+		
+		firstLearned.setText("Z èeštiny: "+ df.format(learned[0]*100)+" %");
+		secondLearned.setText("Do èeštiny: "+ df.format(learned[1]*100)+" %");
+		
 		mCheckBox.setText(topics.get(position).getName());
 		mCheckBox.setTag(position);
 		mCheckBox.setChecked(mSparseBooleanArray.get(position));

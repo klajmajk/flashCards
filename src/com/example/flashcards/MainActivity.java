@@ -25,7 +25,6 @@ public class MainActivity extends ActionBarActivity implements
 		NavigationDrawerFragment.NavigationDrawerCallbacks {
 
 	private static final String LOG_TAG = "MAIN_ACTIVITY";
-
 	/**
 	 * Fragment managing the behaviors, interactions and presentation of the
 	 * navigation drawer.
@@ -38,8 +37,6 @@ public class MainActivity extends ActionBarActivity implements
 	 * {@link #restoreActionBar()}.
 	 */
 	private CharSequence mTitle;
-
-	private Dictionary activeDictionary;
 	List<WeakReference<Fragment>> fragList = new ArrayList<WeakReference<Fragment>>();
 
 	@Override
@@ -65,9 +62,6 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onNavigationDrawerItemSelected(Dictionary dictionary) {
 		// TODO this should be edited to a nicer form
-		Log.d(LOG_TAG, "dicitionary: " + dictionary + " activeDictionary"
-				+ activeDictionary);
-		activeDictionary = dictionary;
 		Log.d(LOG_TAG, "onNavigationDrawerItemSelected dictionary: "
 				+ dictionary);
 		// update the main content by replacing fragments
@@ -102,6 +96,12 @@ public class MainActivity extends ActionBarActivity implements
 			return true;
 		}
 		return super.onCreateOptionsMenu(menu);
+	}
+	
+	@Override
+	public void onPause(){
+		super.onPause();
+		Controller.getInstanceOf().persist();
 	}
 
 	@Override

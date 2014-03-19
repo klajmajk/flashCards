@@ -1,5 +1,6 @@
 package com.example.flashcards;
 
+import android.R.bool;
 import android.os.Bundle;
 
 import android.speech.tts.TextToSpeech;
@@ -8,9 +9,11 @@ import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
 import android.util.Log;
+import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
+import android.view.View.OnKeyListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
@@ -29,7 +32,7 @@ public class LearningSessionFlippedFragment extends Fragment implements
 	private Button mWrongButton;
 
 	private ImageButton mSpeak;
-	private TextToSpeech tts;;
+	private TextToSpeech tts;
 
 	public static Fragment newInstance() {
 		LearningSessionFlippedFragment fragment = new LearningSessionFlippedFragment();
@@ -51,6 +54,7 @@ public class LearningSessionFlippedFragment extends Fragment implements
 		mRootView = mInflater.inflate(R.layout.fragment_learning_session_flip,
 				mContainer, false);
 		flip(mRootView);
+		
 
 		tts = new TextToSpeech(getActivity(), (OnInitListener) this);
 		return mRootView;
@@ -72,13 +76,15 @@ public class LearningSessionFlippedFragment extends Fragment implements
 
 			}
 		});
-		
+
 		mSpeak = (ImageButton) mRootView.findViewById(R.id.speak_out_button);
+		if(Controller.getInstanceOf().isFromFirst()) mSpeak.setVisibility(View.VISIBLE);
+		else mSpeak.setVisibility(View.INVISIBLE);
 		mSpeak.setOnClickListener(new OnClickListener() {
 
 			@Override
 			public void onClick(View v) {
-				speakOut();
+								speakOut();
 
 			}
 		});
@@ -114,9 +120,13 @@ public class LearningSessionFlippedFragment extends Fragment implements
 	@Override
 	public void onInit(int status) {
 		if (status == TextToSpeech.SUCCESS) {
-
-			int result = tts.setLanguage(Controller.getInstanceOf()
-					.getActiveDictionary().getSecond());
+			Controller controller = Controller.getInstanceOf();
+			int result = 0;
+			if (controller.isFromFirst())
+				result = tts.setLanguage(controller
+						.getActiveDictionary().getSecond());
+			else result = tts.setLanguage(controller
+					.getActiveDictionary().getFirst());
 
 			if (result == TextToSpeech.LANG_MISSING_DATA
 					|| result == TextToSpeech.LANG_NOT_SUPPORTED) {
@@ -130,24 +140,24 @@ public class LearningSessionFlippedFragment extends Fragment implements
 		}
 
 	}
-	
-	 @Override
-	    public void onDestroy() {
-	        // Don't forget to shutdown tts!
-	        if (tts != null) {
-	            tts.stop();
-	            tts.shutdown();
-	        }
-	        super.onDestroy();
-	    }
-	 
+
+	@Override
+	public void onDestroy() {
+		// Don't forget to shutdown tts!
+		if (tts != null) {
+			tts.stop();
+			tts.shutdown();
+		}
+		super.onDestroy();
+	}
 
 	private void speakOut() {
 		String text = Controller.getInstanceOf().getSecondText();
-		int index = text.indexOf('-');
-		if(index != -1) text  = text.substring(0, index-1);
+		text = text.replaceAll("\\(.*?\\)","");
 		tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
 	}
+	
+	
 
 }

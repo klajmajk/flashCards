@@ -72,7 +72,6 @@ public class Controller {
 
 	public String getFirstText() {
 		try {
-			activeWord = DictionaryRandomizer.getRandom(sessionWords, fromFirst);
 
 			Log.d(LOG_TAG, "getFirstText activeWord: " + activeWord);
 			if (fromFirst)
@@ -153,6 +152,39 @@ public class Controller {
 		this.activeDictionary = model.getDictionaries().get(0);
 		persist();
 
+	}
+
+	public boolean isFromFirst() {
+		return fromFirst;
+	}
+
+	public void newWord() {
+		activeWord = DictionaryRandomizer.getRandom(sessionWords, fromFirst);
+		
+	}
+	public double[] getTopicLearnedTest(Topic topic, List<Word> allWords){
+		List<Word> words = new ArrayList<>();
+		for (Word word : allWords) {
+			if(word.getTopic().equals(topic)) words.add(word);
+		}	
+		double learnedFirst = 0;
+		double learnedSecond = 0;
+		int size = words.size();
+		for (Word word : words) {
+			System.out.println();
+			learnedFirst += (((double)Math.abs(word.getProbabilityClassFromFirst()-5))/4)*((double)1/size);
+			learnedSecond += (((double)Math.abs(word.getProbabilityClassFromSecond()-5))/4)*((double)1/size);
+		}
+		
+		double[] result = new double [2];
+		result[0] = learnedFirst;
+		result[1] = learnedSecond;
+		return result;
+		
+	}
+	
+	public double[] getActiveTopicLearned(Topic topic){
+		return getTopicLearnedTest(topic, activeDictionary.getWords());
 	}
 
 }

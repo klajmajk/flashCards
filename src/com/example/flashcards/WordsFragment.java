@@ -1,5 +1,6 @@
 package com.example.flashcards;
 
+import java.util.ArrayList;
 import java.util.List;
 
 import android.app.Activity;
@@ -21,8 +22,7 @@ public class WordsFragment extends Fragment {
 	/**
 	 * The fragment argument representing the section number for this fragment.
 	 */
-	private static final String LOG_TAG = "MAIN FRAGMENT";
-	private Dictionary activeDictionary;
+	private static final String LOG_TAG = "WordsFragment";
 	private View rootView;
 
 	/**
@@ -44,7 +44,6 @@ public class WordsFragment extends Fragment {
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
 		Log.d(LOG_TAG, "MainFragment onCreateView");
-		activeDictionary = Controller.getInstanceOf().getActiveDictionary();
 		
 		rootView = inflater.inflate(R.layout.fragment_main, container,
 				false);
@@ -63,8 +62,7 @@ public class WordsFragment extends Fragment {
 		// TODO Auto-generated method stub
 		super.onResume();
 		ListView listView = (ListView) rootView.findViewById(R.id.words_listView);
-		List<Word> list = activeDictionary.getWords();
-		Log.d(LOG_TAG, "Words"+list.toString());
+		List<Word> list = Controller.getInstanceOf().getActiveDictionary().getWords();
 		Word[] words = list.toArray(new Word[list.size()]);
 		listView.setAdapter(new ArrayAdapter<Word>(getActivity(),android.R.layout.simple_list_item_1, words));
 	}

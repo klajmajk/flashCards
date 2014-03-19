@@ -17,6 +17,7 @@ import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.AdapterView.OnItemClickListener;
 import android.widget.Button;
+import android.widget.CheckBox;
 import android.widget.ListAdapter;
 import android.widget.ListView;
 import android.widget.ToggleButton;
@@ -71,6 +72,23 @@ public class DictionaryDetailFragment extends Fragment {
 		ListAdapter adapter = new TopicArrayListAdapter(getActivity(), Controller.getInstanceOf()
 				.getActiveDictionary().getTopics(), startButton);
 		listView.setAdapter(adapter);
+		listView.setOnItemClickListener(new OnItemClickListener() {
+
+			@Override
+			public void onItemClick(AdapterView<?> adapterView, View view, int arg2,
+					long arg3) {
+
+				CheckBox mCheckBox = (CheckBox) view
+						.findViewById(R.id.topic_checkBox);
+				if(mCheckBox.isChecked()){
+					mCheckBox.setChecked(false);
+				}
+				else mCheckBox.setChecked(true);
+				Log.d(LOG_TAG, "item clicked");
+				
+				
+			}
+		});
 		
 		
 	}

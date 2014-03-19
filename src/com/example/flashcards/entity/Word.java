@@ -22,11 +22,30 @@ public class Word  implements Serializable{
 		this.second = second;
 		this.wordUsage = wordUsage;
 		this.probabilityClassFromFirst = 5;
+		this.probabilityClassFromSecond = 5;
 		this.topic = topic;
 	}
 	
 	
 	
+	
+	
+	public Word(String first, String second, List<String> wordUsage,
+			Topic topic, int probabilityClassFromFirst,
+			int probabilityClassFromSecond) {
+		super();
+		this.first = first;
+		this.second = second;
+		this.wordUsage = wordUsage;
+		this.topic = topic;
+		this.probabilityClassFromFirst = probabilityClassFromFirst;
+		this.probabilityClassFromSecond = probabilityClassFromSecond;
+	}
+
+
+
+
+
 	public Word() {
 		super();
 		this.probabilityClassFromFirst = 1;
@@ -86,7 +105,7 @@ public class Word  implements Serializable{
 
 	@Override
 	public String toString() {
-		return first + " | " + second;
+		return first + " | " + second+" "+probabilityClassFromFirst+" "+probabilityClassFromSecond;
 	}
 
 

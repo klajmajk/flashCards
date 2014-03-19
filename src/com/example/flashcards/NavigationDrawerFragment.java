@@ -118,14 +118,14 @@ public class NavigationDrawerFragment extends Fragment {
 					@Override
 					public void onItemClick(AdapterView<?> parent, View view,
 							int position, long id) {
-						dictionarySelected((Dictionary) mDrawerListView
-								.getAdapter().getItem(position));
+						dictionarySelected(Controller.getInstanceOf().getModel().getDictionaries().get(position));
 
 					}
 				});
 		// dictionary selection
 		List<Dictionary> list = Controller.getInstanceOf().getModel()
 				.getDictionaries();
+		Log.d(LOG_TAG, "dicts reloaded");
 		mDrawerListView.setAdapter(new ArrayAdapter<Dictionary>(getActionBar()
 				.getThemedContext(), android.R.layout.simple_list_item_1,
 				android.R.id.text1, list.toArray(new Dictionary[list.size()])));
