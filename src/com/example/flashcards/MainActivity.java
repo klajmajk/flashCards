@@ -45,7 +45,6 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	protected void onCreate(Bundle savedInstanceState) {
 
-		// TODO tohle je docasne reseni jak se zbavit obnoveni starych fragmentu
 		super.onCreate(savedInstanceState);
 		Controller.getInstanceOf().setContext(this);
 		setContentView(R.layout.activity_main);

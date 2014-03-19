@@ -30,11 +30,7 @@ public class MainDictionaryFragment extends Fragment implements
 	public static MainDictionaryFragment newInstance(Dictionary dictionary) {
 
 		MainDictionaryFragment fragment = new MainDictionaryFragment();
-		Bundle args = new Bundle();
 		Controller.getInstanceOf().setActiveDictionary(dictionary);
-		Log.d(LOG_TAG, dictionary.toString());
-		args.putSerializable(WordsFragment.ARG_DICTIONARY, dictionary);
-		fragment.setArguments(args);
 		return fragment;
 	}
 	
@@ -135,13 +131,11 @@ public class MainDictionaryFragment extends Fragment implements
 		switch (position) {
 		case 0:
 			mFragment =DictionaryDetailFragment
-					.newInstance((Dictionary) getArguments().getSerializable(
-							WordsFragment.ARG_DICTIONARY));
+					.newInstance();
 			return mFragment;
 		case 1:
 			
-			mFragment = WordsFragment.newInstance((Dictionary) getArguments()
-					.getSerializable(WordsFragment.ARG_DICTIONARY));
+			mFragment = WordsFragment.newInstance();
 			return mFragment;
 
 		default:

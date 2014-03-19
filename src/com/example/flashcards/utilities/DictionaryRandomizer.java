@@ -12,20 +12,21 @@ public class DictionaryRandomizer {
     static Random rand = new Random();
 
 
-    public static Word getRandom(List<Word> words) {
+    public static Word getRandom(List<Word> words, boolean fromFirst) {
     	Log.d(LOG_TAG, "Words: " + words);
 
         int totalSum = 0;
         for(Word word : words) {
-            totalSum = totalSum + word.getProbabilityClass();        
-            Log.d(LOG_TAG, "WOrd: "+ word+" Probability: "+ word.getProbabilityClass());
+            if(fromFirst) totalSum = totalSum + word.getProbabilityClassFromFirst();   
+            else totalSum = totalSum + word.getProbabilityClassFromSecond();   
         }
 
         int index = rand.nextInt(totalSum);
         int sum = 0;
         int i=0;
         while(sum <= index ) {
-             sum = sum + words.get(i++).getProbabilityClass();
+        	if(fromFirst) sum = sum + words.get(i++).getProbabilityClassFromFirst();
+        	else sum = sum + words.get(i++).getProbabilityClassFromSecond();
         }
         Log.d(LOG_TAG, "index: "+index+" i: "+i+" sum: "+sum);
 

@@ -36,7 +36,7 @@ public class Controller {
 		}
 		return instance;
 
-	}	
+	}
 
 	public void setContext(Context context) {
 		this.context = context;
@@ -53,14 +53,8 @@ public class Controller {
 
 	public void setActiveDictionary(Dictionary dictionary) {
 		this.activeDictionary = dictionary;
-		Log.d(LOG_TAG, "Setting active dict: "+dictionary);
+		Log.d(LOG_TAG, "Setting active dict: " + dictionary);
 
-	}
-
-	
-	
-	public void fromFirst(boolean fromFirst){
-		this.fromFirst = fromFirst;
 	}
 
 	public void addNewWord(Word word) {
@@ -78,22 +72,26 @@ public class Controller {
 
 	public String getFirstText() {
 		try {
-			activeWord = DictionaryRandomizer.getRandom(sessionWords);
+			activeWord = DictionaryRandomizer.getRandom(sessionWords, fromFirst);
 
-			Log.d(LOG_TAG, "getFirstText activeWord: "+ activeWord);
-			if(fromFirst) return activeWord.getFirst();
-			else return activeWord.getSecond();
+			Log.d(LOG_TAG, "getFirstText activeWord: " + activeWord);
+			if (fromFirst)
+				return activeWord.getFirst();
+			else
+				return activeWord.getSecond();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
 		return null;
 	}
-	
+
 	public String getSecondText() {
 		try {
-			Log.d(LOG_TAG, "activeWord activeWord: "+ activeWord);
-			if(fromFirst) return activeWord.getSecond();
-			else return activeWord.getFirst();
+			Log.d(LOG_TAG, "activeWord activeWord: " + activeWord);
+			if (fromFirst)
+				return activeWord.getSecond();
+			else
+				return activeWord.getFirst();
 		} catch (Exception e) {
 			e.printStackTrace();
 		}
@@ -101,36 +99,60 @@ public class Controller {
 	}
 
 	public void wrongAnswer() {
-		int probabilityClass = activeWord.getProbabilityClass();
-		if(probabilityClass<5) activeWord.setProbablilityClass(probabilityClass+1);
-		
+		if (fromFirst) {
+			int probabilityClass = activeWord.getProbabilityClassFromFirst();
+			if (probabilityClass < 5)
+				activeWord.setProbabilityClassFromFirst(probabilityClass + 1);
+		} else {
+			int probabilityClass = activeWord.getProbabilityClassFromSecond();
+			if (probabilityClass < 5)
+				activeWord.setProbabilityClassFromSecond(probabilityClass + 1);
+		}
+
 	}
 
 	public void correctAnswer() {
-		int probabilityClass = activeWord.getProbabilityClass();
-		if(probabilityClass>1) activeWord.setProbablilityClass(probabilityClass-1);
-		
+
+		if (fromFirst) {
+			int probabilityClass = activeWord.getProbabilityClassFromFirst();
+			if (probabilityClass > 1)
+				activeWord.setProbabilityClassFromFirst(probabilityClass - 1);
+		} else {
+			int probabilityClass = activeWord.getProbabilityClassFromSecond();
+			if (probabilityClass > 1)
+				activeWord.setProbabilityClassFromSecond(probabilityClass - 1);
+
+		}
+
 	}
 
 	public void startLearningSession(List<Topic> topics, boolean fromFirst) {
 		this.fromFirst = fromFirst;
 		sessionWords = new ArrayList<>();
-		Log.d(LOG_TAG, "Chosen topics: "+topics);
+		Log.d(LOG_TAG, "Chosen topics: " + topics);
 		for (Word word : activeDictionary.getWords()) {
-			if(topics.contains(word.getTopic())) sessionWords.add(word);
+			if (topics.contains(word.getTopic()))
+				sessionWords.add(word);
 		}
-		Log.d(LOG_TAG, "seesionWord settup to: "+ sessionWords);
+		Log.d(LOG_TAG, "seesionWord settup to: " + sessionWords);
 	}
-	
-	public void persist(){
+
+	public void persist() {
 		Persistence.save((Serializable) model.getDictionaries(), context);
 	}
-	
-	public void readPersistentData(){
-		List<Dictionary> dicts = (List<Dictionary>)Persistence.read(context);
+
+	public void readPersistentData() {
+		List<Dictionary> dicts = (List<Dictionary>) Persistence.read(context);
 		model.setDictionaries(dicts);
-		Log.d(LOG_TAG, "Dictionaries loaded: "+model.getDictionaries());
-		
+		Log.d(LOG_TAG, "Dictionaries loaded: " + model.getDictionaries());
+
+	}
+
+	public void resetDictionaryData() {
+		model.setDictionaries(null);
+		this.activeDictionary = model.getDictionaries().get(0);
+		persist();
+
 	}
 
 }

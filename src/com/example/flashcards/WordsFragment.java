@@ -21,7 +21,6 @@ public class WordsFragment extends Fragment {
 	/**
 	 * The fragment argument representing the section number for this fragment.
 	 */
-	static final String ARG_DICTIONARY = "dictionary";
 	private static final String LOG_TAG = "MAIN FRAGMENT";
 	private Dictionary activeDictionary;
 	private View rootView;
@@ -29,18 +28,10 @@ public class WordsFragment extends Fragment {
 	/**
 	 * Returns a new instance of this fragment for the given section number.
 	 */
-	public static WordsFragment newInstance(Dictionary dictionary) {
+	public static WordsFragment newInstance() {
 
 		WordsFragment fragment = new WordsFragment();
-		Bundle args = new Bundle();
-		//TODO to remove
-		Controller.getInstanceOf().setActiveDictionary(dictionary);
-		Log.d(LOG_TAG, dictionary.toString());
-		args.putSerializable(ARG_DICTIONARY, dictionary);
-		fragment.setArguments(args);
-
-		Log.d(LOG_TAG, "newInstance from args dictionary: "
-				+ fragment.getArguments().getSerializable(ARG_DICTIONARY));
+		Log.d(LOG_TAG, "newInstance from args dictionary: ");
 		return fragment;
 	}
 
@@ -81,8 +72,6 @@ public class WordsFragment extends Fragment {
 	@Override
 	public void onAttach(Activity activity) {
 		super.onAttach(activity);
-		Log.d(LOG_TAG, "onAttach dictionary: "
-				+ getArguments().getSerializable(ARG_DICTIONARY));
 		((MainActivity) activity).onSectionAttached(Controller.getInstanceOf().getActiveDictionary());
 	}
 }

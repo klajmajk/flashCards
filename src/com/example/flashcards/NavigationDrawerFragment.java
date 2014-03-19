@@ -307,6 +307,11 @@ public class NavigationDrawerFragment extends Fragment {
 			Intent myIntent = new Intent(getActivity(), HelloActivity.class);
 			getActivity().startActivity(myIntent);
 			return true;
+		} else if (item.getItemId() == R.id.action_settings) {
+			Log.d(LOG_TAG, "staring prefferences activity");
+			Intent myIntent = new Intent(getActivity(), SettingsActivity.class);
+			getActivity().startActivity(myIntent);
+			return true;
 		}
 
 		return super.onOptionsItemSelected(item);

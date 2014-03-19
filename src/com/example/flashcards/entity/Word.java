@@ -10,7 +10,8 @@ public class Word  implements Serializable{
 	private List<String> wordUsage;
 	private Topic topic;
 	//pravdìpodobnost zobrazení 5 nejèastìji (neumím) 1 nejménì èasto (umím)
-	private int rating;
+	private int probabilityClassFromFirst;
+	private int probabilityClassFromSecond;
 	
 	
 	
@@ -20,7 +21,7 @@ public class Word  implements Serializable{
 		this.first = first;
 		this.second = second;
 		this.wordUsage = wordUsage;
-		this.rating = 5;
+		this.probabilityClassFromFirst = 5;
 		this.topic = topic;
 	}
 	
@@ -28,7 +29,7 @@ public class Word  implements Serializable{
 	
 	public Word() {
 		super();
-		this.rating = 1;
+		this.probabilityClassFromFirst = 1;
 	}
 
 
@@ -51,13 +52,26 @@ public class Word  implements Serializable{
 	public void setWordUsage(List<String> wordUsage) {
 		this.wordUsage = wordUsage;
 	}
-	public int getProbabilityClass() {
-		return rating;
+	public int getProbabilityClassFromFirst() {
+		return probabilityClassFromFirst;
 	}
-	public void setProbablilityClass(int rating) {
-		this.rating = rating;
+	public void setProbabilityClassFromFirst(int rating) {
+		this.probabilityClassFromFirst = rating;		
 	}
 	
+	
+	public int getProbabilityClassFromSecond() {
+		return probabilityClassFromSecond;
+	}
+
+
+
+	public void setProbabilityClassFromSecond(int probablilityClassFromSecond) {
+		this.probabilityClassFromSecond = probablilityClassFromSecond;
+	}
+
+
+
 	public Topic getTopic() {
 		return topic;
 	}
@@ -74,6 +88,10 @@ public class Word  implements Serializable{
 	public String toString() {
 		return first + " | " + second;
 	}
+
+
+
+	
 	
 	
 	

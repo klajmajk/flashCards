@@ -55,6 +55,14 @@ public class Dictionary implements Serializable {
 		addTopic(word.getTopic());
 		
 	}
+	public Locale getFirst() {
+		return first;
+	}
+	public Locale getSecond() {
+		return second;
+	}
+	
+	
 	
 	
 	

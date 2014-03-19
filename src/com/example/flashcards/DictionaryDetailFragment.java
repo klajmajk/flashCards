@@ -27,20 +27,14 @@ import com.example.flashcards.mvc.Controller;
 
 public class DictionaryDetailFragment extends Fragment {
 
-	private static final String ARG_DICTIONARY = "activeDictionary";
 	private static final String LOG_TAG = "DictionaryDetailFragment";
 	
 	private ListView listView;
 	private ToggleButton toggleButton;
 	private Button startButton;
 
-	public static Fragment newInstance(Dictionary activeDictionary) {
+	public static Fragment newInstance() {
 		DictionaryDetailFragment fragment = new DictionaryDetailFragment();
-		Bundle args = new Bundle();
-		// TODO to remove
-		Controller.getInstanceOf().setActiveDictionary(activeDictionary);
-		args.putSerializable(ARG_DICTIONARY, activeDictionary);
-		fragment.setArguments(args);
 		return fragment;
 	}
 
