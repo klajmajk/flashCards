@@ -38,6 +38,10 @@
             android:name="com.example.flashcards.SettingsActivity"
             android:label="@string/app_name" >
         </activity>
+        <activity
+            android:name="com.example.flashcards.LearningActivity"
+            android:label="@string/app_name" >
+        </activity>
     </application>
 
 </manifest>

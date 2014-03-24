@@ -8,21 +8,25 @@ import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.Fragment;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.util.Log;
 import android.view.KeyEvent;
 import android.view.LayoutInflater;
 import android.view.View;
 import android.view.View.OnClickListener;
 import android.view.View.OnKeyListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
 import com.example.flashcards.mvc.Controller;
+import com.example.flashcards.utilities.IMyFragmentCallback;
+import com.example.flashcards.utilities.MyActionModeCallback;
 
 public class LearningSessionFlippedFragment extends Fragment implements
-		TextToSpeech.OnInitListener {
+		TextToSpeech.OnInitListener, IMyFragmentCallback {
 	private static final String LOG_TAG = "LearningSessionFragment";
 	private static final String ARG_FROM_FIRST = "from_first";
 	private LayoutInflater mInflater;
@@ -33,6 +37,9 @@ public class LearningSessionFlippedFragment extends Fragment implements
 
 	private ImageButton mSpeak;
 	private TextToSpeech tts;
+	private TextView mTextView;
+	private MyActionModeCallback mActionModeCallback;
+	private ActionMode mActionMode;
 
 	public static Fragment newInstance() {
 		LearningSessionFlippedFragment fragment = new LearningSessionFlippedFragment();
@@ -48,6 +55,8 @@ public class LearningSessionFlippedFragment extends Fragment implements
 				.getSupportActionBar();
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 
+		mActionModeCallback = new MyActionModeCallback(getActivity(), this);
+
 		mInflater = inflater;
 		mContainer = container;
 		Log.d(LOG_TAG, "infalting after flip");
@@ -62,10 +71,25 @@ public class LearningSessionFlippedFragment extends Fragment implements
 	}
 
 	public void flip(View view) {
-		TextView textView = (TextView) mRootView
+		mTextView = (TextView) mRootView
 				.findViewById(R.id.second_view_textView);
-		Log.d(LOG_TAG, "textView: " + textView);
-		textView.setText(Controller.getInstanceOf().getSecondText());
+		Log.d(LOG_TAG, "textView: " + mTextView);
+		mTextView.setOnLongClickListener(new OnLongClickListener() {
+
+
+			@Override
+			public boolean onLongClick(View v) {
+				if (mActionMode != null) {
+					return false;
+				}
+				mActionModeCallback.setmWord(Controller.getInstanceOf().getActiveWord());
+
+				mActionMode = ((ActionBarActivity)getActivity()).startSupportActionMode(mActionModeCallback);
+				v.setSelected(true);
+				return true;
+			}
+		});
+		refresh();
 
 		mCorrectButton = (Button) mRootView.findViewById(R.id.correct_button);
 		mCorrectButton.setOnClickListener(new OnClickListener() {
@@ -108,9 +132,11 @@ public class LearningSessionFlippedFragment extends Fragment implements
 	public void correctClick(View view) {
 		Controller.getInstanceOf().correctAnswer();
 		newWord();
+		
 	}
 
 	public void newWord() {
+		Controller.getInstanceOf().newWord();
 		getActivity().getSupportFragmentManager().popBackStack();
 		getActivity().getSupportFragmentManager().beginTransaction()
 				.replace(R.id.container, LearningSessionFragment.newInstance())
@@ -156,6 +182,19 @@ public class LearningSessionFlippedFragment extends Fragment implements
 		text = text.replaceAll("\\(.*?\\)","");
 		tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
 
+	}
+
+	@Override
+	public void setActionMode(ActionMode mode) {
+		mActionMode = mode;
+		
+	}
+
+	@Override
+	public void refresh() {
+
+		mTextView.setText(Controller.getInstanceOf().getSecondText());
+		
 	}
 	
 	

@@ -19,11 +19,11 @@ public class Controller {
 	private Model model;
 	private static Controller instance;
 	private Dictionary activeDictionary;
-	private DictionaryRandomizer randomizer;
 	private Word activeWord;
 	private boolean fromFirst;
 	private List<Word> sessionWords;
-	private Context context;
+	private Context context = null;
+	private boolean  learningSessionRunning = false;
 
 	public Controller() {
 		super();
@@ -39,8 +39,13 @@ public class Controller {
 	}
 
 	public void setContext(Context context) {
-		this.context = context;
-		readPersistentData();
+		if(this.context == null){
+
+			Log.d(LOG_TAG, "Setting context and reading persistent data");
+			this.context = context;
+			readPersistentData();
+		}else this.context = context;
+		
 	}
 
 	public Model getModel() {
@@ -122,22 +127,41 @@ public class Controller {
 				activeWord.setProbabilityClassFromSecond(probabilityClass - 1);
 
 		}
+		
+		//persist();
 
+	}
+	
+	public void learningSessionCheck(){
+		if(learningSessionRunning){
+			persist();
+			learningSessionRunning = false;
+		}
 	}
 
 	public void startLearningSession(List<Topic> topics, boolean fromFirst) {
 		this.fromFirst = fromFirst;
+		this.learningSessionRunning  = true;
 		sessionWords = new ArrayList<>();
 		Log.d(LOG_TAG, "Chosen topics: " + topics);
 		for (Word word : activeDictionary.getWords()) {
 			if (topics.contains(word.getTopic()))
 				sessionWords.add(word);
 		}
+		newWord();
 		Log.d(LOG_TAG, "seesionWord settup to: " + sessionWords);
 	}
 
 	public void persist() {
-		Persistence.save((Serializable) model.getDictionaries(), context);
+		Runnable toRun = new Runnable() {
+			
+			@Override
+			public void run() {
+				Persistence.save((Serializable) model.getDictionaries(), context);
+				
+			}
+		};
+		toRun.run();
 	}
 
 	public void readPersistentData() {
@@ -185,6 +209,28 @@ public class Controller {
 	
 	public double[] getActiveTopicLearned(Topic topic){
 		return getTopicLearnedTest(topic, activeDictionary.getWords());
+	}
+
+	
+
+	public void editWord(Word mWord, String first, String second) {
+		int pos = activeDictionary.getWords().indexOf(mWord);
+		if(pos!=-1)		{	
+			Word word = activeDictionary.getWords().get(pos);
+			//TODO tady by to melo hazet vyjimku kdyz ta podminka neprojde
+			if((first!=null)&&(second!=null)&&(first.trim()!="")&&(second.trim()!="")){
+				word.setFirst(first.trim());
+				word.setSecond(second.trim());
+				persist();
+			}		
+			
+		}
+		
+		
+	}
+
+	public Word getActiveWord() {
+		return activeWord;
 	}
 
 }

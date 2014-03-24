@@ -1,38 +1,48 @@
 package com.example.flashcards;
 
-import java.util.List;
-
-import com.example.flashcards.entity.Topic;
-import com.example.flashcards.entity.Word;
-import com.example.flashcards.mvc.Controller;
-
+import android.app.AlertDialog;
+import android.content.DialogInterface;
 import android.os.Bundle;
 import android.speech.tts.TextToSpeech;
 import android.speech.tts.TextToSpeech.OnInitListener;
 import android.support.v4.app.Fragment;
-import android.support.v4.app.FragmentManager;
 import android.support.v7.app.ActionBar;
 import android.support.v7.app.ActionBarActivity;
+import android.support.v7.view.ActionMode;
 import android.util.Log;
-import android.view.KeyEvent;
+import android.view.ActionMode.Callback;
+import android.view.ContextMenu;
+import android.view.ContextMenu.ContextMenuInfo;
 import android.view.LayoutInflater;
+import android.view.Menu;
+import android.view.MenuInflater;
+import android.view.MenuItem;
 import android.view.View;
 import android.view.View.OnClickListener;
-import android.view.View.OnKeyListener;
+import android.view.View.OnLongClickListener;
 import android.view.ViewGroup;
 import android.widget.Button;
+import android.widget.EditText;
 import android.widget.ImageButton;
 import android.widget.TextView;
 
+import com.example.flashcards.mvc.Controller;
+import com.example.flashcards.utilities.MyActionModeCallback;
+import com.example.flashcards.utilities.IMyFragmentCallback;
+
 public class LearningSessionFragment extends Fragment implements
-		TextToSpeech.OnInitListener {
+		TextToSpeech.OnInitListener, IMyFragmentCallback{
+	private static final String LOG_TAG = "LearningSessionFragment";
 	private View mRootView;
 	private Button mFlipButton;
 	private ImageButton mSpeak;
 	private TextToSpeech tts;
+	private MyActionModeCallback mActionModeCallback;
+	private ActionMode mActionMode;
+	private TextView mTextView;
 
 	public static Fragment newInstance() {
-		LearningSessionFragment fragment = new LearningSessionFragment();
+		Fragment fragment = new LearningSessionFragment();
 
 		return fragment;
 	}
@@ -46,6 +56,8 @@ public class LearningSessionFragment extends Fragment implements
 		actionBar.setNavigationMode(ActionBar.NAVIGATION_MODE_STANDARD);
 		mRootView = inflater.inflate(R.layout.fragment_learning_session,
 				container, false);
+
+		mActionModeCallback = new MyActionModeCallback(getActivity(), this);
 
 		mFlipButton = (Button) mRootView.findViewById(R.id.flip_button);
 		mFlipButton.setOnClickListener(new OnClickListener() {
@@ -77,21 +89,31 @@ public class LearningSessionFragment extends Fragment implements
 
 			}
 		});
-		
-		
 
-		newWord();
+		mTextView = (TextView) mRootView
+				.findViewById(R.id.first_word_textView);
+
+		mTextView.setOnLongClickListener(new OnLongClickListener() {
+
+
+			@Override
+			public boolean onLongClick(View v) {
+				if (mActionMode != null) {
+					return false;
+				}
+				mActionModeCallback.setmWord(Controller.getInstanceOf().getActiveWord());
+
+				mActionMode = ((ActionBarActivity)getActivity()).startSupportActionMode(mActionModeCallback);
+				v.setSelected(true);
+				return true;
+			}
+		});
+		
+		refresh();
 
 		tts = new TextToSpeech(getActivity(), (OnInitListener) this);
 		return mRootView;
 
-	}
-
-	public void newWord() {
-		TextView textView = (TextView) mRootView
-				.findViewById(R.id.first_word_textView);
-		Controller.getInstanceOf().newWord();
-		textView.setText(Controller.getInstanceOf().getFirstText());
 	}
 
 	// TODO tohle je i ve flipped stejny lepší navrh by to chtìlo
@@ -133,9 +155,22 @@ public class LearningSessionFragment extends Fragment implements
 
 	private void speakOut() {
 		String text = Controller.getInstanceOf().getFirstText();
-		text = text.replaceAll("\\(.*?\\)","");
+		text = text.replaceAll("\\(.*?\\)", "");
 		tts.speak(text, TextToSpeech.QUEUE_FLUSH, null);
-
 	}
+
+	@Override
+	public void setActionMode(ActionMode mode) {
+		mActionMode = mode;
+		
+	}
+
+	@Override
+	public void refresh() {
+		mTextView.setText(Controller.getInstanceOf().getFirstText());
+		
+	}
+	
+	
 
 }

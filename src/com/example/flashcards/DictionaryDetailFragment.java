@@ -51,6 +51,8 @@ public class DictionaryDetailFragment extends Fragment {
 
 		toggleButton = (ToggleButton) rootView.findViewById(R.id.direction_togglebutton);
 		
+		Controller.getInstanceOf().learningSessionCheck();
+		
 
 		
 		

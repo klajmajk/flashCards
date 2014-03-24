@@ -101,6 +101,7 @@ public class MainActivity extends ActionBarActivity implements
 	@Override
 	public void onPause(){
 		super.onPause();
+		Log.d(LOG_TAG, "persist");
 		Controller.getInstanceOf().persist();
 	}
 
