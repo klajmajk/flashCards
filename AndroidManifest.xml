@@ -27,7 +27,7 @@
             </intent-filter>
         </activity>
         <activity
-            android:name="com.example.flashcards.HelloActivity"
+            android:name="com.example.flashcards.ImportActivity"
             android:label="@string/app_name" >
         </activity>
         <activity

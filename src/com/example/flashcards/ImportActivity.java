@@ -16,22 +16,28 @@
 
 package com.example.flashcards;
 
-import  com.example.flashcards.oauth.*;
+import java.util.prefs.Preferences;
+
 import android.accounts.AccountManager;
 import android.app.Activity;
 import android.app.AlertDialog;
 import android.app.Dialog;
 import android.content.Context;
 import android.content.Intent;
+import android.content.SharedPreferences;
 import android.net.ConnectivityManager;
 import android.net.NetworkInfo;
 import android.os.Bundle;
+import android.preference.PreferenceManager;
 import android.util.Log;
 import android.view.View;
 import android.widget.TextView;
 import android.widget.Toast;
 
-import com.example.flashcards.R;
+import com.example.flashcards.oauth.ImportFromGoogleTask;
+import com.example.flashcards.utilities.ActivityServices;
+import com.example.flashcards.utilities.Constants;
+import com.google.android.gms.auth.GoogleAuthUtil;
 import com.google.android.gms.auth.GooglePlayServicesAvailabilityException;
 import com.google.android.gms.auth.UserRecoverableAuthException;
 import com.google.android.gms.common.AccountPicker;
@@ -41,15 +47,14 @@ import com.google.android.gms.common.GooglePlayServicesUtil;
  * The TokenInfoActivity is a simple app that allows users to acquire, inspect and invalidate
  * authentication tokens for a different accounts and scopes.
  *
- * In addition see implementations of {@link AbstractGetNameTask} for an illustration of how to use
+ * In addition see implementations of {@link ImportFromGoogleTask} for an illustration of how to use
  * the {@link GoogleAuthUtil}.
  */
-public class HelloActivity extends Activity {
+public class ImportActivity extends Activity implements IFromTaskCallBack {
     private static final String TAG = "PlayHelloActivity";
-    private static final String SCOPE = "oauth2:https://spreadsheets.google.com/feeds/spreadsheets/private/full https://spreadsheets.google.com/feeds/";
+    
     public static final String EXTRA_ACCOUNTNAME = "extra_accountname";
 
-    private TextView mOut;
     private final Context mContext = this;
 
     static final int REQUEST_CODE_PICK_ACCOUNT = 1000;
@@ -59,26 +64,16 @@ public class HelloActivity extends Activity {
 
     private String mEmail;
 
-    private Type requestType;
 
     public static String TYPE_KEY = "type_key";
     public static enum Type {FOREGROUND, BACKGROUND, BACKGROUND_WITH_SYNC}
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
-    	Log.d(LOG_TAG, "Creating hello activity");
+    	mEmail = PreferenceManager.getDefaultSharedPreferences(this).getString(Constants.PREF_EMAIL, null);
     	super.onCreate(savedInstanceState);
         setContentView(R.layout.accounts_tester);
-
-        mOut = (TextView) findViewById(R.id.message);
-
-        //Bundle extras = getIntent().getExtras();
-        requestType = Type.valueOf(HelloActivity.Type.FOREGROUND.name());
-        setTitle(getTitle() + " - " + requestType.name());
-        /*if (extras.containsKey(EXTRA_ACCOUNTNAME)) {
-            mEmail = extras.getString(EXTRA_ACCOUNTNAME);
-            getTask(HelloActivity.this, mEmail, SCOPE).execute();
-        }*/
+        setTitle("Import");
     }
 
     @Override
@@ -86,6 +81,9 @@ public class HelloActivity extends Activity {
         if (requestCode == REQUEST_CODE_PICK_ACCOUNT) {
             if (resultCode == RESULT_OK) {
                 mEmail = data.getStringExtra(AccountManager.KEY_ACCOUNT_NAME);
+                SharedPreferences.Editor edit = PreferenceManager.getDefaultSharedPreferences(this).edit();
+                edit.putString(Constants.PREF_EMAIL, mEmail);
+                edit.commit();
                 importWordsIntoDictionary();
             } else if (resultCode == RESULT_CANCELED) {
                 Toast.makeText(this, "You must pick an account", Toast.LENGTH_SHORT).show();
@@ -106,7 +104,7 @@ public class HelloActivity extends Activity {
         }
         if (resultCode == RESULT_OK) {
             Log.i(TAG, "Retrying");
-            getTask(this, mEmail, SCOPE).execute();
+            (new ImportFromGoogleTask(this, mEmail)).execute(this);
             return;
         }
         if (resultCode == RESULT_CANCELED) {
@@ -128,8 +126,8 @@ public class HelloActivity extends Activity {
         if (mEmail == null) {
             pickUserAccount();
         } else {
-            if (isDeviceOnline()) {
-                getTask(HelloActivity.this, mEmail, SCOPE).execute(this);
+            if (ActivityServices.isDeviceConnected(this)) {
+                (new ImportFromGoogleTask(this, mEmail)).execute(this);
             } else {
                 Toast.makeText(this, "No network connection available", Toast.LENGTH_SHORT).show();
             }
@@ -143,24 +141,14 @@ public class HelloActivity extends Activity {
                 accountTypes, false, null, null, null, null);
         
         startActivityForResult(intent, REQUEST_CODE_PICK_ACCOUNT);
-    }
-
-    /** Checks whether the device currently has a network connection */
-    private boolean isDeviceOnline() {
-        ConnectivityManager connMgr = (ConnectivityManager)
-                getSystemService(Context.CONNECTIVITY_SERVICE);
-        NetworkInfo networkInfo = connMgr.getActiveNetworkInfo();
-        if (networkInfo != null && networkInfo.isConnected()) {
-            return true;
-        }
-        return false;
-    }
+    }    
 
 
     /**
      * This method is a hook for background threads and async tasks that need to update the UI.
      * It does this by launching a runnable under the UI thread.
      */
+    @Override
     public void show(final String message) {
         runOnUiThread(new Runnable() {
             @Override
@@ -174,11 +162,23 @@ public class HelloActivity extends Activity {
             }
         });
     }
+    
+    public void toastAndFinish(final String message) {
+        runOnUiThread(new Runnable() {
+            @Override
+            public void run() {
+            	Toast.makeText(getApplicationContext(), message, Toast.LENGTH_LONG).show();
+            	finish();
+
+            }
+        });
+    }
 
     /**
      * This method is a hook for background threads and async tasks that need to provide the
      * user a response UI when an exception occurs.
      */
+    @Override
     public void handleException(final Exception e) {
         runOnUiThread(new Runnable() {
             @Override
@@ -190,7 +190,7 @@ public class HelloActivity extends Activity {
                     int statusCode = ((GooglePlayServicesAvailabilityException)e)
                             .getConnectionStatusCode();
                     Dialog dialog = GooglePlayServicesUtil.getErrorDialog(statusCode,
-                            HelloActivity.this,
+                            ImportActivity.this,
                             REQUEST_CODE_RECOVER_FROM_PLAY_SERVICES_ERROR);
                     dialog.show();
                 } else if (e instanceof UserRecoverableAuthException) {
@@ -205,21 +205,11 @@ public class HelloActivity extends Activity {
         });
     }
 
-    /**
-     * Note: This approach is for demo purposes only. Clients would normally not get tokens in the
-     * background from a Foreground activity.
-     */
-    private AbstractGetNameTask getTask(
-            HelloActivity activity, String email, String scope) {
-        switch(requestType) {
-            case FOREGROUND:
-                return new GetNameInForeground(activity, email, scope);
-            case BACKGROUND:
-                return new GetNameInBackground(activity, email, scope);
-            case BACKGROUND_WITH_SYNC:
-                return new GetNameInBackgroundWithSync(activity, email, scope);
-            default:
-                return new GetNameInBackground(activity, email, scope);
-        }
-    }
+	@Override
+	public void taskFinished() {
+		// TODO Auto-generated method stub
+		
+	}
+
+   
 }

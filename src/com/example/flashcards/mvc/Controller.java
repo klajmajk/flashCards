@@ -3,14 +3,20 @@ package com.example.flashcards.mvc;
 import java.io.Serializable;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Locale;
 
 import android.R.bool;
 import android.content.Context;
 import android.util.Log;
 
+import com.example.flashcards.entity.ActionType;
 import com.example.flashcards.entity.Dictionary;
+import com.example.flashcards.entity.DictionarySyncParam;
+import com.example.flashcards.entity.ImportResult;
 import com.example.flashcards.entity.Topic;
 import com.example.flashcards.entity.Word;
+import com.example.flashcards.entity.WordAction;
+import com.example.flashcards.imports.GoogleDocsImport;
 import com.example.flashcards.persistence.Persistence;
 import com.example.flashcards.utilities.DictionaryRandomizer;
 
@@ -64,6 +70,7 @@ public class Controller {
 
 	public void addNewWord(Word word) {
 		activeDictionary.addWord(word);
+		addToWordActionQueue(word, ActionType.ADD);
 		persist();
 	}
 
@@ -221,16 +228,61 @@ public class Controller {
 			if((first!=null)&&(second!=null)&&(first.trim()!="")&&(second.trim()!="")){
 				word.setFirst(first.trim());
 				word.setSecond(second.trim());
+				addToWordActionQueue(word, ActionType.UPDATE);
 				persist();
 			}		
 			
-		}
-		
-		
+		}		
 	}
 
 	public Word getActiveWord() {
 		return activeWord;
+	}
+
+	public void addToWordActionQueue(Word wordMy, ActionType type) {
+		Log.d(LOG_TAG, "New entry in ActionQueue: "+wordMy+" type: "+type.toString());
+		activeDictionary.getActionQueue().add(new WordAction(wordMy, type));
+		
+	}
+
+	public ImportResult handleImport(List<Word> imported) {
+		ImportResult importResult = GoogleDocsImport.merge(activeDictionary.getWords(), imported, this);
+		activeDictionary.getWords().clear();
+		activeDictionary.getTopics().clear();
+		addImportWords(importResult.words);	
+		persist();
+		return importResult;
+	}
+
+	public void setWordsLine(Word word, int resultRow) {
+		int index = activeDictionary.getWords().indexOf(word);
+		activeDictionary.getWords().get(index).setSpreadsheetLine(resultRow);
+		
+	}
+
+	public void setActiveSyncParams(DictionarySyncParam dictionarySyncParam) {
+		activeDictionary.setSyncParams(dictionarySyncParam);
+		persist();
+		
+	}
+
+	public String getSyncStatusText() {
+		if(activeDictionary.getActionQueue().size() == 0){
+			return "Synchronizováno";
+		}
+		else{
+			return activeDictionary.getActionQueue().size()+" slovíèek èeká na synchronizaci";
+		}
+	}
+
+	public void addNewDictionary(Locale first, Locale second) {
+		Dictionary dict = new Dictionary(first, second);
+		Log.d(LOG_TAG, "Adding: "+first+" / "+second);
+		if(!model.getDictionaries().contains(dict)){	
+			model.getDictionaries().add(dict);
+			persist();
+		}
+		
 	}
 
 }

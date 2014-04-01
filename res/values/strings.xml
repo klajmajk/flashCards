@@ -29,5 +29,7 @@
         <item >Background</item>
         <item >Background with Sync</item>
     </string-array>
+        <string name="new_dict_button">Nový slovník</string>
+        <string name="confirm">Potvrdit</string>
 
 </resources>

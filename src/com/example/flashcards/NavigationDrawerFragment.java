@@ -27,9 +27,11 @@ import android.view.Menu;
 import android.view.MenuInflater;
 import android.view.MenuItem;
 import android.view.View;
+import android.view.View.OnClickListener;
 import android.view.ViewGroup;
 import android.widget.AdapterView;
 import android.widget.ArrayAdapter;
+import android.widget.Button;
 import android.widget.ListView;
 import android.widget.Toast;
 
@@ -75,6 +77,7 @@ public class NavigationDrawerFragment extends Fragment {
 	private Dictionary selectedDictionary = null;
 	private boolean mFromSavedInstanceState;
 	private boolean mUserLearnedDrawer;
+	private Button mNewDictButton;
 
 	public NavigationDrawerFragment() {
 	}
@@ -111,8 +114,18 @@ public class NavigationDrawerFragment extends Fragment {
 	@Override
 	public View onCreateView(LayoutInflater inflater, ViewGroup container,
 			Bundle savedInstanceState) {
-		mDrawerListView = (ListView) inflater.inflate(
-				R.layout.fragment_navigation_drawer, container, false);
+		View rootView =inflater.inflate(R.layout.fragment_navigation_drawer, container, false);
+		mDrawerListView = (ListView) rootView.findViewById(R.id.dicts_listView);		
+		mNewDictButton = (Button) rootView.findViewById(R.id.new_dict_button);
+		mNewDictButton.setOnClickListener(new OnClickListener() {
+			
+			@Override
+			public void onClick(View v) {
+				getActivity().getSupportFragmentManager().beginTransaction().replace(R.id.container, new NewDictionaryFragment()).commit();
+				closeDrawer();
+				
+			}
+		});
 		mDrawerListView
 				.setOnItemClickListener(new AdapterView.OnItemClickListener() {
 					@Override
@@ -123,16 +136,10 @@ public class NavigationDrawerFragment extends Fragment {
 					}
 				});
 		// dictionary selection
-		List<Dictionary> list = Controller.getInstanceOf().getModel()
-				.getDictionaries();
-		Log.d(LOG_TAG, "dicts reloaded");
-		mDrawerListView.setAdapter(new ArrayAdapter<Dictionary>(getActionBar()
-				.getThemedContext(), android.R.layout.simple_list_item_1,
-				android.R.id.text1, list.toArray(new Dictionary[list.size()])));
 
 		mDrawerListView.setItemChecked(
 				Controller.getInstanceOf().getModel().getDictionaries().indexOf(selectedDictionary), true);
-		return mDrawerListView;
+		return rootView;
 	}
 
 	public boolean isDrawerOpen() {
@@ -193,7 +200,10 @@ public class NavigationDrawerFragment extends Fragment {
 			@Override
 			public void onDrawerOpened(View drawerView) {
 				super.onDrawerOpened(drawerView);
+				reloadDictionaries();
+				Log.d(LOG_TAG, "drawerr opened");
 				if (!isAdded()) {
+					Log.d(LOG_TAG, "Learning drawer");
 					return;
 				}
 
@@ -201,6 +211,7 @@ public class NavigationDrawerFragment extends Fragment {
 					// The user manually opened the drawer; store this flag to
 					// prevent auto-showing
 					// the navigation drawer automatically in the future.
+					Log.d(LOG_TAG, "Learning drawer");
 					mUserLearnedDrawer = true;
 					SharedPreferences sp = PreferenceManager
 							.getDefaultSharedPreferences(getActivity());
@@ -210,6 +221,15 @@ public class NavigationDrawerFragment extends Fragment {
 
 				getActivity().supportInvalidateOptionsMenu(); // calls
 																// onPrepareOptionsMenu()
+			}
+
+			private void reloadDictionaries() {
+				List<Dictionary> list = Controller.getInstanceOf().getModel()
+						.getDictionaries();
+				Log.d(LOG_TAG, "dicts reloaded");
+				mDrawerListView.setAdapter(new ArrayAdapter<Dictionary>(getActionBar()
+						.getThemedContext(), android.R.layout.simple_list_item_1,
+						android.R.id.text1, list));
 			}
 		};
 
@@ -240,11 +260,15 @@ public class NavigationDrawerFragment extends Fragment {
 			mDrawerListView.setItemChecked(
 					Controller.getInstanceOf().getModel().getDictionaries().indexOf(dictionary), true);
 		}
-		if (mDrawerLayout != null) {
-			mDrawerLayout.closeDrawer(mFragmentContainerView);
-		}
+		closeDrawer();
 		if (mCallbacks != null) {
 			mCallbacks.onNavigationDrawerItemSelected(dictionary);
+		}
+	}
+
+	private void closeDrawer() {
+		if (mDrawerLayout != null) {
+			mDrawerLayout.closeDrawer(mFragmentContainerView);
 		}
 	}
 
@@ -304,7 +328,7 @@ public class NavigationDrawerFragment extends Fragment {
 			return true;
 		} else if (item.getItemId() == R.id.action_import) {
 			Log.d(LOG_TAG, "staring hello activity");
-			Intent myIntent = new Intent(getActivity(), HelloActivity.class);
+			Intent myIntent = new Intent(getActivity(), ImportActivity.class);
 			getActivity().startActivity(myIntent);
 			return true;
 		} else if (item.getItemId() == R.id.action_settings) {

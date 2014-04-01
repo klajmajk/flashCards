@@ -24,16 +24,11 @@ public class ImportParser {
 		List<Word> words = new ArrayList<>();
 			for (int i = 0; i < entries.size(); i++) {
 				String itemAddress = entries.get(i).getTitle().getPlainText();
-				Log.d(LOG_TAG, "line: " + line + " itemAddress ss: "
-						+ itemAddress+ " first: "+first+ " second: "+second);
+				/*Log.d(LOG_TAG, "line: " + line + " itemAddress ss: "
+						+ itemAddress+ " first: "+first+ " second: "+second);*/
 				if (Integer.parseInt(itemAddress.substring(1)) != line) {
-					// jsme na novém øádku
-					if (!((first == null) || (second == null))){
-						Word word = new Word(first, second, null, new Topic(
-								topic));
-						words.add(word);
-						Log.d(LOG_TAG, "importing: " + word.toString());
-					}
+					// jsme na novém øádku pokud ma first i second naimportujeme pokud ne pouze se posuneme
+					wordToAdd(topic, line, first, second, words);
 
 					line++;
 				}
@@ -49,8 +44,19 @@ public class ImportParser {
 					second = entries.get(i).getPlainTextContent();
 				}
 			}
+			//poslední slovo
+			wordToAdd(topic, line, first, second, words);
 		
 		return words;
+	}
+
+	private static void wordToAdd(String topic, int line, String first,
+			String second, List<Word> words) {
+		if (!((first == null) || (second == null))){
+			Word word = new Word(first, second, null, new Topic(
+					topic), line);
+			words.add(word);
+		}
 	}
 
 }

@@ -10,10 +10,9 @@
         android:layout_width="match_parent"
         android:layout_height="0dp"
         android:layout_weight="1"
-        android:drawSelectorOnTop="false"
         android:choiceMode="multipleChoice"
-        android:descendantFocusability="blocksDescendants" >
-
+        android:descendantFocusability="blocksDescendants"
+        android:drawSelectorOnTop="false" >
     </ListView>
 
     <LinearLayout
@@ -26,26 +25,45 @@
             android:layout_width="wrap_content"
             android:layout_height="wrap_content"
             android:text="Vyberte směr zkoušení: " />
-        
-        <ToggleButton 
-        android:id="@+id/direction_togglebutton"
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:textOn="Z češtiny"
-        android:textOff="Do češtiny"
-        android:checked="true" />
-        
+
+        <ToggleButton
+            android:id="@+id/direction_togglebutton"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:checked="true"
+            android:textOff="Do češtiny"
+            android:textOn="Z češtiny" />
     </LinearLayout>
 
-	
+    <LinearLayout
+        android:layout_width="match_parent"
+        android:layout_height="wrap_content"
+        android:gravity="center_vertical" >
+
+        <ProgressBar
+            android:id="@+id/sync_progressBar"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content" />
+        
+        <TextView
+            android:id="@+id/sync_textView"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Stav synchronizace" />
+
+        <!-- <Button
+            android:id="@+id/sync_button"
+            android:layout_width="wrap_content"
+            android:layout_height="wrap_content"
+            android:text="Synchronizovat" /> -->
+    </LinearLayout>
+
     <Button
         android:id="@+id/start_button"
         android:layout_width="match_parent"
         android:layout_height="wrap_content"
+        android:enabled="false"
         android:onClick="startLearningSession"
-        android:text="Start"
-        android:enabled="false" />
-
-    
+        android:text="Start" />
 
 </LinearLayout>

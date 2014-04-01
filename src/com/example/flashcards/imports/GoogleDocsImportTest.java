@@ -13,9 +13,6 @@ public class GoogleDocsImportTest extends TestCase {
 	@Test
 	public void testImport() {
 
-	   Dictionary dict = GoogleDocsImport.importFromGoogleDocs("adaklima", "Kun_ma_2_nohy");
-	   // check if multiply(10,5) returns 50
-	   assertEquals("dummy", new Dictionary(Locale.ENGLISH, Locale.GERMAN), dict);
 	 } 
 
 }

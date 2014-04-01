@@ -69,7 +69,7 @@ public class MainActivity extends ActionBarActivity implements
 		FragmentTransaction transaction = fragmentManager.beginTransaction();
 
 		dictFragment = MainDictionaryFragment.newInstance(dictionary);
-		transaction.replace(R.id.container, dictFragment);
+		transaction.replace(R.id.container, dictFragment).addToBackStack(null);
 
 		transaction.commit();
 	}

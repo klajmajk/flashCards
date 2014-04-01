@@ -102,6 +102,7 @@ public class WordsFragment extends Fragment implements IMyFragmentCallback{
 
 	@Override
 	public void refresh() {
+		Log.d(LOG_TAG, "refreshing");
 		ListView listView = (ListView) rootView.findViewById(R.id.words_listView);
 		List<Word> list = Controller.getInstanceOf().getActiveDictionary().getWords();
 		Word[] words = list.toArray(new Word[list.size()]);

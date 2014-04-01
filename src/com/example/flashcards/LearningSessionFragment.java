@@ -64,7 +64,6 @@ public class LearningSessionFragment extends Fragment implements
 
 			@Override
 			public void onClick(View v) {
-				getActivity().getSupportFragmentManager().popBackStack();
 				getActivity()
 						.getSupportFragmentManager()
 						.beginTransaction()
